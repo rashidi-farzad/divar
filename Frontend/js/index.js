@@ -2,10 +2,14 @@ import {
   fetchPopularCities,
   getCityCookie,
   setCityCookie,
+  fetchCities,
 } from "./utils/cities.js";
 
 const $ = document;
 const popularCitiesParent = $.querySelector(".main__cities-list .row");
+const citySearchInput = $.querySelector(".main__input");
+const citiesSearchResult = document.querySelector(".search-result-cities");
+let cities = null;
 
 const cityClickHandler = (event, city) => {
   event.preventDefault();
@@ -38,10 +42,34 @@ const loadCityPosts = (cityCookie) => {
 
 window.cityClickHandler = cityClickHandler;
 
+const citySearchHandler = (event) => {
+  const citySearchTitle = event.target.value;
+  if (citySearchTitle.trim()) {
+    const citiesResult = cities.filter((city) =>
+      city.name.startsWith(citySearchTitle),
+    );
+    citiesSearchResult.classList.add("active");
+    citiesSearchResult.innerHTML = "";
+    citiesResult.forEach((city) => {
+      citiesSearchResult.insertAdjacentHTML(
+        "beforeend",
+        `
+        <li>${city.name}</li>
+      `,
+      );
+    });
+    return true;
+  }
+  citiesSearchResult.classList.remove("active");
+};
+
+citySearchInput.addEventListener("keyup", (event) => citySearchHandler(event));
+
 window.addEventListener("load", async () => {
   const popularCities = await fetchPopularCities();
   showPopularCities(popularCities);
 
   const cityCookie = getCityCookie();
   loadCityPosts(cityCookie);
+  cities = await fetchCities();
 });
