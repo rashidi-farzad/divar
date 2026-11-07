@@ -1,7 +1,9 @@
 import { getAllCities } from "../../utils/shared.js";
+import { saveInLocalStorage } from "../../utils/utils.js";
 
 window.addEventListener("load", () => {
   const loadingContainer = document.querySelector("#loading-container");
+
   getAllCities().then((response) => {
     loadingContainer.style.display = "none";
     const popularCitiesContainer = document.querySelector("#popular-cities");
@@ -22,8 +24,8 @@ window.addEventListener("load", () => {
             searchResult.insertAdjacentHTML(
               "beforeend",
               `
-                <li>${city.name}</li>
-                    `,
+                <li onclick="cityClickHandler('${city.name}', '${city.id}')">${city.name}</li>
+              `,
             );
           });
         } else {
@@ -31,8 +33,8 @@ window.addEventListener("load", () => {
           searchResult.insertAdjacentHTML(
             "beforeend",
             `
-            <img src="https://support-faq.divarcdn.com/web/2024/03/static/media/magnifier.7f88b2e3f8ae30f4333986d0b0fbcf1d.svg" />
-            <p class="empty">نتیجه ای برای جستجوی شما پیدا نشد!</p>
+              <img src="https://support-faq.divarcdn.com/web/2024/03/static/media/magnifier.7f88b2e3f8ae30f4333986d0b0fbcf1d.svg" />
+              <p class="empty">نتیجه‌ای برای جستجوی شما پیدا نشد.</p>
             `,
           );
         }
@@ -42,15 +44,21 @@ window.addEventListener("load", () => {
     });
 
     const popularCities = response.data.cities.filter((city) => city.popular);
+
     popularCities.forEach((city) => {
       popularCitiesContainer.insertAdjacentHTML(
         "beforeend",
         `
-            <li class="main__cities-item">
-                <p class="main__cities-link">${city.name}</p>
-            </li>
-            `,
+        <li class="main__cities-item" onclick="cityClickHandler('${city.name}', '${city.id}')">
+            <p class="main__cities-link">${city.name}</p>
+        </li>
+      `,
       );
     });
+
+    window.cityClickHandler = (cityName, cityID) => {
+      saveInLocalStorage("cities", [{ name: cityName, id: cityID }]);
+      location.href = "/pages/posts.html";
+    };
   });
 });

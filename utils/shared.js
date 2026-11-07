@@ -23,4 +23,11 @@ const getAndShowSocials = async () => {
   });
 };
 
-export { baseUrl, getAllCities, getAndShowSocials };
+const getPosts = async (citiesIDs) => {
+  const url = `${baseUrl}/v1/post?city=${citiesIDs}`;
+  const res = await fetch(url);
+  const posts = await res.json();
+  return posts;
+};
+
+export { baseUrl, getAllCities, getAndShowSocials, getPosts };
