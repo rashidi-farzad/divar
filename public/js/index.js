@@ -5,9 +5,43 @@ window.addEventListener("load", () => {
   getAllCities().then((response) => {
     loadingContainer.style.display = "none";
     const popularCitiesContainer = document.querySelector("#popular-cities");
-    console.log(response.data.cities);
+    const searchInput = document.querySelector("#search-input");
+    const searchResult = document.querySelector(".search-result-cities");
+
+    searchInput.addEventListener("keyup", (event) => {
+      if (event.target.value.length) {
+        searchResult.classList.add("active");
+
+        const searchResultCities = response.data.cities.filter((city) =>
+          city.name.startsWith(event.target.value),
+        );
+
+        if (searchResultCities.length) {
+          searchResult.innerHTML = "";
+          searchResultCities.forEach((city) => {
+            searchResult.insertAdjacentHTML(
+              "beforeend",
+              `
+                <li>${city.name}</li>
+                    `,
+            );
+          });
+        } else {
+          searchResult.innerHTML = "";
+          searchResult.insertAdjacentHTML(
+            "beforeend",
+            `
+            <img src="https://support-faq.divarcdn.com/web/2024/03/static/media/magnifier.7f88b2e3f8ae30f4333986d0b0fbcf1d.svg" />
+            <p class="empty">نتیجه ای برای جستجوی شما پیدا نشد!</p>
+            `,
+          );
+        }
+      } else {
+        searchResult.classList.remove("active");
+      }
+    });
+
     const popularCities = response.data.cities.filter((city) => city.popular);
-    console.log(popularCities);
     popularCities.forEach((city) => {
       popularCitiesContainer.insertAdjacentHTML(
         "beforeend",
