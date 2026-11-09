@@ -97,9 +97,7 @@ window.addEventListener("load", () => {
       if (!categoryInfos.length) {
         const subCategory = findSubCategoryById(categories, categoryID);
 
-        subCategory.filters.forEach((filter) => filterGenerator(filter));
-
-        console.log("subCategory ->", subCategory);
+        subCategory?.filters.forEach((filter) => filterGenerator(filter));
 
         if (subCategory) {
           categoriesContainer.insertAdjacentHTML(
@@ -127,7 +125,34 @@ window.addEventListener("load", () => {
             `,
           );
         } else {
-          // SubSubCategory :))
+          const subSubCategory = findSubSubCategoryById(categories, categoryID);
+          const subSubCategoryParent = findSubCategoryById(
+            categories,
+            subSubCategory.parent,
+          );
+
+          subSubCategory?.filters.forEach((filter) => filterGenerator(filter));
+
+          categoriesContainer.insertAdjacentHTML(
+            "beforeend",
+            `
+              <div class="all-categories" onclick="backToAllCategories()">
+                <p>همه اگهی ها</p>
+                <i class="bi bi-arrow-right"></i>
+              </div>
+              <div class="sidebar__category-link active-category" href="#">
+                <div class="sidebar__category-link_details">
+                  <i class="sidebar__category-icon bi bi-house"></i>
+                  <p>${subSubCategoryParent.title}</p>
+                </div>
+                <ul class="subCategory-list">
+                  ${subSubCategoryParent.subCategories
+                    .map(createSubCategoryHtml)
+                    .join("")}
+                </ul>
+              </div>
+            `,
+          );
         }
       } else {
         categoryInfos.forEach((category) => {
@@ -185,6 +210,20 @@ window.addEventListener("load", () => {
 
     return allSubCategories.find(
       (subCategory) => subCategory._id === categoryID,
+    );
+  };
+
+  const findSubSubCategoryById = (categories, categoryID) => {
+    const allSubCategories = categories.flatMap(
+      (category) => category.subCategories,
+    );
+
+    const allSubSubCategories = allSubCategories.flatMap(
+      (subCategory) => subCategory.subCategories,
+    );
+
+    return allSubSubCategories.find(
+      (subSubCategory) => subSubCategory._id === categoryID,
     );
   };
 
