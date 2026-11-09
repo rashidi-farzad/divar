@@ -14,4 +14,25 @@ const addParamToUrl = (param, value) => {
   location.href = url.toString();
 };
 
-export { saveIntoLocalStorage, getFromLocalStorage, addParamToUrl };
+const calculateRelativeDifference = (createdAt) => {
+  const currentTime = new Date();
+  const createdTime = new Date(createdAt);
+
+  const timeDiffrence = currentTime - createdTime;
+
+  const hours = Math.floor(timeDiffrence / (60 * 60 * 1000));
+
+  if (hours < 24) {
+    return `${hours} ساعت پیش`;
+  } else {
+    const days = Math.floor(hours / 24);
+    return `${days} روز پیش`;
+  }
+};
+
+export {
+  saveIntoLocalStorage,
+  getFromLocalStorage,
+  addParamToUrl,
+  calculateRelativeDifference,
+};

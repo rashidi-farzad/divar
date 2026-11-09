@@ -1,6 +1,9 @@
 import { baseUrl, getPosts, getPostCategories } from "../../utils/shared.js";
-import { addParamToUrl, getFromLocalStorage } from "../../utils/utils.js";
-
+import {
+  addParamToUrl,
+  getFromLocalStorage,
+  calculateRelativeDifference,
+} from "../../utils/utils.js";
 window.addEventListener("load", () => {
   const loadingContainer = document.querySelector("#loading-container");
 
@@ -18,6 +21,7 @@ window.addEventListener("load", () => {
     const postsContainer = document.querySelector("#posts-container");
     if (posts.length) {
       posts.forEach((post) => {
+        const date = calculateRelativeDifference(post.createdAt);
         postsContainer.insertAdjacentHTML(
           "beforeend",
           `
@@ -38,7 +42,7 @@ window.addEventListener("load", () => {
                               : post.price.toLocaleString() + " تومان"
                           }
                         </span>
-                        <span class="product-card__time">Date</span>
+                        <span class="product-card__time">${date}</span>
                       </div>
                     </div>
                     <div class="product-card__left">
