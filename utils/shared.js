@@ -30,4 +30,16 @@ const getPosts = async (citiesIDs) => {
   return posts;
 };
 
-export { baseUrl, getAllCities, getAndShowSocials, getPosts };
+const getPostCategories = async () => {
+  const res = await fetch(`${baseUrl}/v1/category`);
+  const response = await res.json();
+  return response.data.categories;
+};
+
+export {
+  baseUrl,
+  getAllCities,
+  getAndShowSocials,
+  getPosts,
+  getPostCategories,
+};

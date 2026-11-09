@@ -6,4 +6,12 @@ const getFromLocalStorage = (key) => {
   return JSON.parse(localStorage.getItem(key));
 };
 
-export { saveIntoLocalStorage, getFromLocalStorage };
+const addParamToUrl = (param, value) => {
+  const url = new URL(location.href);
+  const searchParams = url.searchParams;
+  searchParams.set(param, value);
+  url.search = searchParams.toString();
+  location.href = url.toString();
+};
+
+export { saveIntoLocalStorage, getFromLocalStorage, addParamToUrl };

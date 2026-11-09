@@ -1,5 +1,5 @@
-import { baseUrl, getPosts } from "../../utils/shared.js";
-import { getFromLocalStorage } from "../../utils/utils.js";
+import { baseUrl, getPosts, getPostCategories } from "../../utils/shared.js";
+import { addParamToUrl, getFromLocalStorage } from "../../utils/utils.js";
 
 window.addEventListener("load", () => {
   const loadingContainer = document.querySelector("#loading-container");
@@ -67,4 +67,27 @@ window.addEventListener("load", () => {
       postsContainer.innerHTML = `<p class="empty">هیچ آگهی یافت نشد!</p>`;
     }
   };
+
+  window.categoryClickHandler = (categoryID) => {
+    addParamToUrl("categoryID", categoryID);
+  };
+
+  getPostCategories().then((categories) => {
+    const categoriesContainer = document.querySelector("#categories-container");
+    loadingContainer.style.display = "none";
+    categoriesContainer.innerHTML = "";
+    categories.forEach((category) => {
+      categoriesContainer.insertAdjacentHTML(
+        "beforeend",
+        `
+        <div class="sidebar__category-link" id="category-${category._id}">
+          <div class="sidebar__category-link-details" onclick="categoryClickHandler('${category._id}')">
+            <i class="sidebar__category-icon bi bi-house"></i>
+            <p>${category.title}</p>
+          </div>
+        </div>
+        `,
+      );
+    });
+  });
 });
