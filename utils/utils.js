@@ -14,6 +14,18 @@ const addParamToUrl = (param, value) => {
   location.href = url.toString();
 };
 
+const getUrlParam = (param) => {
+  const urlParams = new URLSearchParams(location.search);
+  return urlParams.get(param);
+};
+
+const removeParamFromUrl = (param) => {
+  const url = new URL(location.href);
+  url.searchParams.delete(param);
+  window.history.replaceState(null, null, url);
+  location.reload();
+};
+
 const calculateRelativeDifference = (createdAt) => {
   const currentTime = new Date();
   const createdTime = new Date(createdAt);
@@ -34,5 +46,7 @@ export {
   saveIntoLocalStorage,
   getFromLocalStorage,
   addParamToUrl,
+  getUrlParam,
   calculateRelativeDifference,
+  removeParamFromUrl,
 };

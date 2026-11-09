@@ -3,8 +3,11 @@ import {
   addParamToUrl,
   getFromLocalStorage,
   calculateRelativeDifference,
+  getUrlParam,
+  removeParamFromUrl,
 } from "../../utils/utils.js";
 window.addEventListener("load", () => {
+  const categoryID = getUrlParam("categoryID");
   const loadingContainer = document.querySelector("#loading-container");
 
   const cities = getFromLocalStorage("cities");
@@ -75,23 +78,110 @@ window.addEventListener("load", () => {
   window.categoryClickHandler = (categoryID) => {
     addParamToUrl("categoryID", categoryID);
   };
+  window.backToAllCategories = () => {
+    removeParamFromUrl("categoryID");
+  };
 
   getPostCategories().then((categories) => {
     const categoriesContainer = document.querySelector("#categories-container");
     loadingContainer.style.display = "none";
+
     categoriesContainer.innerHTML = "";
-    categories.forEach((category) => {
-      categoriesContainer.insertAdjacentHTML(
-        "beforeend",
-        `
-        <div class="sidebar__category-link" id="category-${category._id}">
-          <div class="sidebar__category-link-details" onclick="categoryClickHandler('${category._id}')">
-            <i class="sidebar__category-icon bi bi-house"></i>
-            <p>${category.title}</p>
-          </div>
-        </div>
-        `,
+
+    if (categoryID) {
+      const categoryInfos = categories.filter(
+        (category) => category._id === categoryID,
       );
-    });
+
+      if (!categoryInfos.length) {
+        const subCategory = findSubCategoryById(categories, categoryID);
+
+        console.log("subCategory ->", subCategory);
+
+        if (subCategory) {
+          categoriesContainer.insertAdjacentHTML(
+            "beforeend",
+            `
+                <div class="all-categories" onclick="backToAllCategories()">
+                  <p>همه اگهی ها</p>
+                  <i class="bi bi-arrow-right"></i>
+                </div>
+                <div
+                  class="sidebar__category-link active-category"
+                  href="#"
+                  id="category-${subCategory._id}"
+                >
+                  <div class="sidebar__category-link_details">
+                    <i class="sidebar__category-icon bi bi-house"></i>
+                    <p>${subCategory.title}</p>
+                  </div>
+                  <ul class="subCategory-list">
+                    ${subCategory.subCategories
+                      .map(createSubCategoryHtml)
+                      .join("")}
+                  </ul>
+                </div>
+            `,
+          );
+        } else {
+          // SubSubCategory :))
+        }
+      } else {
+        categoryInfos.forEach((category) => {
+          categoriesContainer.insertAdjacentHTML(
+            "beforeend",
+            `
+              <div class="all-categories" onclick="backToAllCategories()">
+                <p>همه اگهی ها</p>
+                <i class="bi bi-arrow-right"></i>
+              </div>
+
+              <div class="sidebar__category-link active-category" href="#">
+                <div class="sidebar__category-link_details">
+                  <i class="sidebar__category-icon bi bi-house"></i>
+                  <p>${category.title}</p>
+                </div>
+                <ul class="subCategory-list">
+                  ${category.subCategories.map(createSubCategoryHtml).join("")}
+                </ul>
+              </div>
+          
+            `,
+          );
+        });
+      }
+    } else {
+      categories.forEach((category) => {
+        categoriesContainer.insertAdjacentHTML(
+          "beforeend",
+          `
+            <div class="sidebar__category-link" id="category-${category._id}">
+              <div class="sidebar__category-link_details" onclick="categoryClickHandler('${category._id}')">
+                <i class="sidebar__category-icon bi bi-house"></i>
+                <p>${category.title}</p>
+              </div>
+            </div>
+          `,
+        );
+      });
+    }
   });
+
+  const createSubCategoryHtml = (subCategory) => {
+    return `
+      <li class="${categoryID === subCategory._id ? "active-subCategory" : ""}" onclick="categoryClickHandler('${subCategory._id}')">
+        ${subCategory.title}
+      </li>
+    `;
+  };
+
+  const findSubCategoryById = (categories, categoryID) => {
+    const allSubCategories = categories.flatMap(
+      (category) => category.subCategories,
+    );
+
+    return allSubCategories.find(
+      (subCategory) => subCategory._id === categoryID,
+    );
+  };
 });
