@@ -1,11 +1,12 @@
-import { baseUrl, getPosts, getPostCategories } from "../../utils/shared.js";
+import { baseUrl, getPostCategories, getPosts } from "../../utils/shared.js";
 import {
   addParamToUrl,
+  calcuteRelativeTimeDifference,
   getFromLocalStorage,
-  calculateRelativeDifference,
   getUrlParam,
   removeParamFromUrl,
 } from "../../utils/utils.js";
+
 window.addEventListener("load", () => {
   const categoryID = getUrlParam("categoryID");
   const searchValue = getUrlParam("value");
@@ -25,60 +26,61 @@ window.addEventListener("load", () => {
     const postsContainer = document.querySelector("#posts-container");
     if (posts.length) {
       posts.forEach((post) => {
-        const date = calculateRelativeDifference(post.createdAt);
+        const date = calcuteRelativeTimeDifference(post.createdAt);
         postsContainer.insertAdjacentHTML(
           "beforeend",
           `
-                <div class="col-4">
-                  <a href="post.html/id=${post._id}" class="product-card">
-                    <div class="product-card__right">
-                      <div class="product-card__right-top">
-                        <p class="product-card__link">${post.title}</p>
-                      </div>
-                      <div class="product-card__right-bottom">
-                        <span class="product-card__condition">${
-                          post.dynamicFields[0]?.data
-                        }</span>
-                        <span class="product-card__price">
-                          ${
-                            post.price === 0
-                              ? "توافقی"
-                              : post.price.toLocaleString() + " تومان"
-                          }
-                        </span>
-                        <span class="product-card__time">${date}</span>
-                      </div>
-                    </div>
-                    <div class="product-card__left">
-                    ${
-                      post.pics.length
-                        ? `
-                          <img
-                            class="product-card__img img-fluid"
-                            src="${baseUrl}/${post.pics[0].path}"
-                          />`
-                        : `
-                          <img
-                            class="product-card__img img-fluid"
-                            src="/public/images/main/noPicture.PNG"
-                          />`
-                    }
-                      
-                    </div>
-                  </a>
+            <div class="col-4">
+              <a href="post.html/id=${post._id}" class="product-card">
+                <div class="product-card__right">
+                  <div class="product-card__right-top">
+                    <p class="product-card__link">${post.title}</p>
+                  </div>
+                  <div class="product-card__right-bottom">
+                    <span class="product-card__condition">${
+                      post.dynamicFields[0]?.data
+                    }</span>
+                    <span class="product-card__price">
+                      ${
+                        post.price === 0
+                          ? "توافقی"
+                          : post.price.toLocaleString() + " تومان"
+                      }
+                    </span>
+                    <span class="product-card__time">${date}</span>
+                  </div>
                 </div>
-            
-              `,
+                <div class="product-card__left">
+                ${
+                  post.pics.length
+                    ? `
+                      <img
+                        class="product-card__img img-fluid"
+                        src="${baseUrl}/${post.pics[0].path}"
+                      />`
+                    : `
+                      <img
+                        class="product-card__img img-fluid"
+                        src="/public/images/main/noPicture.PNG"
+                      />`
+                }
+                  
+                </div>
+              </a>
+            </div>
+        
+          `
         );
       });
     } else {
-      postsContainer.innerHTML = `<p class="empty">هیچ آگهی یافت نشد!</p>`;
+      postsContainer.innerHTML = '<p class="empty">آگهی یافت نشد</p>';
     }
   };
 
   window.categoryClickHandler = (categoryID) => {
     addParamToUrl("categoryID", categoryID);
   };
+
   window.backToAllCategories = () => {
     removeParamFromUrl("categoryID");
   };
@@ -91,7 +93,7 @@ window.addEventListener("load", () => {
 
     if (categoryID) {
       const categoryInfos = categories.filter(
-        (category) => category._id === categoryID,
+        (category) => category._id === categoryID
       );
 
       if (!categoryInfos.length) {
@@ -122,13 +124,13 @@ window.addEventListener("load", () => {
                       .join("")}
                   </ul>
                 </div>
-            `,
+            `
           );
         } else {
           const subSubCategory = findSubSubCategoryById(categories, categoryID);
           const subSubCategoryParent = findSubCategoryById(
             categories,
-            subSubCategory.parent,
+            subSubCategory.parent
           );
 
           subSubCategory?.filters.forEach((filter) => filterGenerator(filter));
@@ -140,7 +142,9 @@ window.addEventListener("load", () => {
                 <p>همه اگهی ها</p>
                 <i class="bi bi-arrow-right"></i>
               </div>
-              <div class="sidebar__category-link active-category" href="#">
+              <div class="sidebar__category-link active-category" href="#" onclick="categoryClickHandler('${
+                subSubCategoryParent._id
+              }')">
                 <div class="sidebar__category-link_details">
                   <i class="sidebar__category-icon bi bi-house"></i>
                   <p>${subSubCategoryParent.title}</p>
@@ -151,7 +155,7 @@ window.addEventListener("load", () => {
                     .join("")}
                 </ul>
               </div>
-            `,
+            `
           );
         }
       } else {
@@ -174,7 +178,7 @@ window.addEventListener("load", () => {
                 </ul>
               </div>
           
-            `,
+            `
           );
         });
       }
@@ -189,7 +193,7 @@ window.addEventListener("load", () => {
                 <p>${category.title}</p>
               </div>
             </div>
-          `,
+          `
         );
       });
     }
@@ -197,7 +201,9 @@ window.addEventListener("load", () => {
 
   const createSubCategoryHtml = (subCategory) => {
     return `
-      <li class="${categoryID === subCategory._id ? "active-subCategory" : ""}" onclick="categoryClickHandler('${subCategory._id}')">
+      <li class="${categoryID === subCategory._id ? "active-subCategory" : ""}"
+        onclick="categoryClickHandler('${subCategory._id}')"
+      >
         ${subCategory.title}
       </li>
     `;
@@ -205,30 +211,32 @@ window.addEventListener("load", () => {
 
   const findSubCategoryById = (categories, categoryID) => {
     const allSubCategories = categories.flatMap(
-      (category) => category.subCategories,
+      (category) => category.subCategories
     );
 
     return allSubCategories.find(
-      (subCategory) => subCategory._id === categoryID,
+      (subCategory) => subCategory._id === categoryID
     );
   };
 
   const findSubSubCategoryById = (categories, categoryID) => {
     const allSubCategories = categories.flatMap(
-      (category) => category.subCategories,
+      (category) => category.subCategories
     );
 
     const allSubSubCategories = allSubCategories.flatMap(
-      (subCategory) => subCategory.subCategories,
+      (subCategory) => subCategory.subCategories
     );
 
     return allSubSubCategories.find(
-      (subSubCategory) => subSubCategory._id === categoryID,
+      (subSubCategory) => subSubCategory._id === categoryID
     );
   };
 
   const filterGenerator = (filter) => {
+    console.log("Filter ->", filter);
     const sidebarFiltersContainer = document.querySelector("#sidebar-filters");
+
     sidebarFiltersContainer.insertAdjacentHTML(
       "beforebegin",
       `
@@ -263,7 +271,7 @@ window.addEventListener("load", () => {
                             .sort((a, b) => b - a)
                             .map(
                               (option) =>
-                                `<option value='${option}'>${option}</option>`,
+                                `<option value='${option}'>${option}</option>`
                             )}
                         </select>
                       </div>
@@ -287,13 +295,14 @@ window.addEventListener("load", () => {
               `
             : ""
         }
-      `,
+      `
     );
   };
 
   const removeSearchValueIcon = document.querySelector(
-    "#remove-search-value-icon",
+    "#remove-search-value-icon"
   );
+
   if (searchValue) {
     const searchInput = document.querySelector("#global_search_input");
     searchInput.value = searchValue;

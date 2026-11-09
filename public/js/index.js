@@ -15,7 +15,7 @@ window.addEventListener("load", () => {
         searchResult.classList.add("active");
 
         const searchResultCities = response.data.cities.filter((city) =>
-          city.name.startsWith(event.target.value),
+          city.name.startsWith(event.target.value)
         );
 
         if (searchResultCities.length) {
@@ -25,7 +25,7 @@ window.addEventListener("load", () => {
               "beforeend",
               `
                 <li onclick="cityClickHandler('${city.name}', '${city.id}')">${city.name}</li>
-              `,
+              `
             );
           });
         } else {
@@ -35,7 +35,7 @@ window.addEventListener("load", () => {
             `
               <img src="https://support-faq.divarcdn.com/web/2024/03/static/media/magnifier.7f88b2e3f8ae30f4333986d0b0fbcf1d.svg" />
               <p class="empty">نتیجه‌ای برای جستجوی شما پیدا نشد.</p>
-            `,
+            `
           );
         }
       } else {
@@ -52,7 +52,7 @@ window.addEventListener("load", () => {
         <li class="main__cities-item" onclick="cityClickHandler('${city.name}', '${city.id}')">
             <p class="main__cities-link">${city.name}</p>
         </li>
-      `,
+      `
       );
     });
 

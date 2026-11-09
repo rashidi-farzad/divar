@@ -1,4 +1,4 @@
-const saveIntoLocalStorage = (key, value) => {
+const saveInLocalStorage = (key, value) => {
   localStorage.setItem(key, JSON.stringify(value));
 };
 
@@ -9,8 +9,10 @@ const getFromLocalStorage = (key) => {
 const addParamToUrl = (param, value) => {
   const url = new URL(location.href);
   const searchParams = url.searchParams;
+
   searchParams.set(param, value);
   url.search = searchParams.toString();
+
   location.href = url.toString();
 };
 
@@ -26,13 +28,12 @@ const removeParamFromUrl = (param) => {
   location.reload();
 };
 
-const calculateRelativeDifference = (createdAt) => {
+const calcuteRelativeTimeDifference = (createdAt) => {
   const currentTime = new Date();
   const createdTime = new Date(createdAt);
 
-  const timeDiffrence = currentTime - createdTime;
-
-  const hours = Math.floor(timeDiffrence / (60 * 60 * 1000));
+  const timeDifference = currentTime - createdTime;
+  const hours = Math.floor(timeDifference / (60 * 60 * 1000));
 
   if (hours < 24) {
     return `${hours} ساعت پیش`;
@@ -43,10 +44,10 @@ const calculateRelativeDifference = (createdAt) => {
 };
 
 export {
-  saveIntoLocalStorage,
+  saveInLocalStorage,
   getFromLocalStorage,
   addParamToUrl,
   getUrlParam,
-  calculateRelativeDifference,
+  calcuteRelativeTimeDifference,
   removeParamFromUrl,
 };
