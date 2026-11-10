@@ -14,16 +14,21 @@ window.addEventListener("load", () => {
 
   const cities = getFromLocalStorage("cities");
 
+  let posts = null;
+  let backupPosts = null;
+
   getPosts(cities[0].id).then((response) => {
     loadingContainer.style.display = "none";
 
-    const posts = response.data.posts;
+    posts = response.data.posts;
+    backupPosts = response.data.posts;
 
     generatePosts(posts);
   });
 
   const generatePosts = (posts) => {
     const postsContainer = document.querySelector("#posts-container");
+    postsContainer.innerHTML = "";
     if (posts.length) {
       posts.forEach((post) => {
         const date = calcuteRelativeTimeDifference(post.createdAt);
@@ -69,7 +74,7 @@ window.addEventListener("load", () => {
               </a>
             </div>
         
-          `
+          `,
         );
       });
     } else {
@@ -93,7 +98,7 @@ window.addEventListener("load", () => {
 
     if (categoryID) {
       const categoryInfos = categories.filter(
-        (category) => category._id === categoryID
+        (category) => category._id === categoryID,
       );
 
       if (!categoryInfos.length) {
@@ -124,13 +129,13 @@ window.addEventListener("load", () => {
                       .join("")}
                   </ul>
                 </div>
-            `
+            `,
           );
         } else {
           const subSubCategory = findSubSubCategoryById(categories, categoryID);
           const subSubCategoryParent = findSubCategoryById(
             categories,
-            subSubCategory.parent
+            subSubCategory.parent,
           );
 
           subSubCategory?.filters.forEach((filter) => filterGenerator(filter));
@@ -155,7 +160,7 @@ window.addEventListener("load", () => {
                     .join("")}
                 </ul>
               </div>
-            `
+            `,
           );
         }
       } else {
@@ -178,7 +183,7 @@ window.addEventListener("load", () => {
                 </ul>
               </div>
           
-            `
+            `,
           );
         });
       }
@@ -193,7 +198,7 @@ window.addEventListener("load", () => {
                 <p>${category.title}</p>
               </div>
             </div>
-          `
+          `,
         );
       });
     }
@@ -211,25 +216,25 @@ window.addEventListener("load", () => {
 
   const findSubCategoryById = (categories, categoryID) => {
     const allSubCategories = categories.flatMap(
-      (category) => category.subCategories
+      (category) => category.subCategories,
     );
 
     return allSubCategories.find(
-      (subCategory) => subCategory._id === categoryID
+      (subCategory) => subCategory._id === categoryID,
     );
   };
 
   const findSubSubCategoryById = (categories, categoryID) => {
     const allSubCategories = categories.flatMap(
-      (category) => category.subCategories
+      (category) => category.subCategories,
     );
 
     const allSubSubCategories = allSubCategories.flatMap(
-      (subCategory) => subCategory.subCategories
+      (subCategory) => subCategory.subCategories,
     );
 
     return allSubSubCategories.find(
-      (subSubCategory) => subSubCategory._id === categoryID
+      (subSubCategory) => subSubCategory._id === categoryID,
     );
   };
 
@@ -271,7 +276,7 @@ window.addEventListener("load", () => {
                             .sort((a, b) => b - a)
                             .map(
                               (option) =>
-                                `<option value='${option}'>${option}</option>`
+                                `<option value='${option}'>${option}</option>`,
                             )}
                         </select>
                       </div>
@@ -295,12 +300,12 @@ window.addEventListener("load", () => {
               `
             : ""
         }
-      `
+      `,
     );
   };
 
   const removeSearchValueIcon = document.querySelector(
-    "#remove-search-value-icon"
+    "#remove-search-value-icon",
   );
 
   if (searchValue) {
@@ -311,5 +316,52 @@ window.addEventListener("load", () => {
 
   removeSearchValueIcon.addEventListener("click", () => {
     removeParamFromUrl("value");
+  });
+
+  const justPhotoController = document.querySelector("#just_photo_controll");
+  const exchangeController = document.querySelector("#exchange_controll");
+  const minPriceSelectbox = document.querySelector("#min-price-selectbox");
+  const maxPriceSelectbox = document.querySelector("#max-price-selectbox");
+
+  const applyFilters = () => {
+    let filteredPosts = backupPosts;
+
+    if (justPhotoController.checked) {
+      filteredPosts = filteredPosts.filter((post) => post.pics.length !== 0);
+    }
+    if (exchangeController.checked) {
+      filteredPosts = filteredPosts.filter((post) => post.exchange);
+    }
+
+    // Handle Price Filtering
+    const minPrice = minPriceSelectbox.value;
+    const maxPrice = maxPriceSelectbox.value;
+    if (maxPrice !== "default") {
+      if (minPrice !== "default") {
+        filteredPosts = filteredPosts.filter(
+          (post) => post.price >= minPrice && post.price <= maxPrice,
+        );
+      } else {
+        filteredPosts = filteredPosts.filter((post) => post.price <= maxPrice);
+      }
+    } else {
+      if (minPrice !== "default") {
+        filteredPosts = filteredPosts.filter((post) => post.price >= minPrice);
+      }
+    }
+    generatePosts(filteredPosts);
+  };
+
+  justPhotoController?.addEventListener("change", () => {
+    applyFilters(posts);
+  });
+  exchangeController?.addEventListener("change", () => {
+    applyFilters(posts);
+  });
+  minPriceSelectbox?.addEventListener("change", () => {
+    applyFilters(posts);
+  });
+  maxPriceSelectbox?.addEventListener("change", () => {
+    applyFilters(posts);
   });
 });

@@ -1,5 +1,10 @@
 import { getAndShowSocials } from "../../utils/shared.js";
-import { addParamToUrl, hideModal, showModal } from "../../utils/utils.js";
+import {
+  addParamToUrl,
+  getUrlParam,
+  hideModal,
+  showModal,
+} from "../../utils/utils.js";
 
 window.addEventListener("load", () => {
   getAndShowSocials();
@@ -23,11 +28,15 @@ window.addEventListener("load", () => {
   });
 
   mostSearchKeyWords.forEach((keyword) => {
+    const categoryID = getUrlParam("categoryID");
+
+    let href = `posts.html?value=${keyword}${categoryID ? `&categoryID=${categoryID}` : ""}`;
+
     mostSearchedContainer.insertAdjacentHTML(
       "beforeend",
       `
       <li class="header__searchbar-dropdown-item">
-        <a href="posts.html?value=${keyword}" class="header__searchbar-dropdown-link">${keyword}</a>
+        <a href="${href}" class="header__searchbar-dropdown-link">${keyword}</a>
       </li>
       `,
     );
