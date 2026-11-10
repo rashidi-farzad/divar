@@ -1,10 +1,12 @@
 import {
   getAndShowHeaderCityLocation,
   getAndShowSocials,
+  getAllLocations,
 } from "../../utils/shared.js";
 import {
   addParamToUrl,
   getUrlParam,
+  getFromLocalStorage,
   hideModal,
   showModal,
 } from "../../utils/utils.js";
@@ -13,8 +15,14 @@ window.addEventListener("load", () => {
   getAndShowSocials();
   getAndShowHeaderCityLocation();
 
+  let selectedCities = [];
+  let allCities = [];
+
   const globalSearchInput = document.querySelector("#global_search_input");
   const mostSearchedContainer = document.querySelector("#most_searched");
+  const headerCity = document.querySelector(".header__city");
+  const deleteAllSelectedCities = document.querySelector("#delete-all-cities");
+  const citiesModalList = document.querySelector("#city_modal_list");
   const searchbarModalOverlay = document.querySelector(
     ".searchbar__modal-overlay",
   );
@@ -46,12 +54,67 @@ window.addEventListener("load", () => {
     );
   });
 
+  headerCity?.addEventListener("click", () => {
+    showModal("city-modal", "city-modal--active");
+    const cities = getFromLocalStorage("cities");
+    selectedCities = cities;
+    deleteAllSelectedCities.style.display = "block";
+    addCityToModal(selectedCities);
+  });
+
+  window.removeCityFromModal = (cityID) => {
+    // Codes
+    console.log("cityID => ", cityID);
+  };
+
+  getAllLocations().then((data) => {
+    allCities = data.provinces;
+    console.log(allCities);
+
+    showProvinces(allCities);
+  });
+
+  const showProvinces = (cities) => {
+    cities.forEach((province) => {
+      citiesModalList.insertAdjacentHTML(
+        "beforeend",
+        `
+        <li
+            class="city-modal__cities-item province-item"
+            data-province-id="${province.id}"
+          >
+            <span>${province.name}</span>
+            <i class="city-modal__cities-icon bi bi-chevron-left"></i>
+          </li>
+        `,
+      );
+    });
+  };
+
+  const addCityToModal = (cities) => {
+    const citySelected = document.querySelector("#city-selected");
+    cities.forEach((city) => {
+      citySelected.insertAdjacentHTML(
+        "beforeend",
+        `
+          <div class="city-modal__selected-item">
+            <span class="city-modal__selected-text">${city.title}</span>
+              <button class="city-modal__selected-btn" onclick="removeCityFromModal('${city.id}')">
+                <i class="city-modal__selected-icon bi bi-x"></i>
+              </button>
+          </div>
+        `,
+      );
+    });
+  };
+
   globalSearchInput?.addEventListener("click", () => {
     showModal(
       "header__searchbar-dropdown",
       "header__searchbar-dropdown--active",
     );
   });
+
   searchbarModalOverlay?.addEventListener("click", () => {
     hideModal(
       "header__searchbar-dropdown",
