@@ -16,6 +16,7 @@ window.addEventListener("load", () => {
 
   let posts = null;
   let backupPosts = null;
+  let appliedFilters = {};
 
   getPosts(cities[0].id).then((response) => {
     loadingContainer.style.display = "none";
@@ -239,7 +240,6 @@ window.addEventListener("load", () => {
   };
 
   const filterGenerator = (filter) => {
-    console.log("Filter ->", filter);
     const sidebarFiltersContainer = document.querySelector("#sidebar-filters");
 
     sidebarFiltersContainer.insertAdjacentHTML(
@@ -271,7 +271,7 @@ window.addEventListener("load", () => {
                       data-bs-parent="#accordionFlushExample"
                     >
                       <div class="accordion-body">
-                        <select class="selectbox">
+                        <select class="selectbox" onchange="selectBoxFilterHandler(event.target.value,'${filter.slug}')">
                           ${filter.options
                             .sort((a, b) => b - a)
                             .map(
@@ -326,14 +326,28 @@ window.addEventListener("load", () => {
   const applyFilters = () => {
     let filteredPosts = backupPosts;
 
+    // Handle Dynamic Filters
+    for (const slug in appliedFilters) {
+      filteredPosts = filteredPosts.filter((post) =>
+        post.dynamicFields.some(
+          (field) => field.slug === slug && field.data === appliedFilters[slug],
+        ),
+      );
+    }
+
+    console.log({ ...appliedFilters });
+
+    // Handle Photo Filter
     if (justPhotoController.checked) {
       filteredPosts = filteredPosts.filter((post) => post.pics.length !== 0);
     }
+
+    // Handle Exchange Filter
     if (exchangeController.checked) {
       filteredPosts = filteredPosts.filter((post) => post.exchange);
     }
 
-    // Handle Price Filtering
+    // Handle Min Max Filtering
     const minPrice = minPriceSelectbox.value;
     const maxPrice = maxPriceSelectbox.value;
     if (maxPrice !== "default") {
@@ -364,4 +378,10 @@ window.addEventListener("load", () => {
   maxPriceSelectbox?.addEventListener("change", () => {
     applyFilters(posts);
   });
+
+  window.selectBoxFilterHandler = (value, slug) => {
+    appliedFilters[slug] = value;
+
+    applyFilters();
+  };
 });
