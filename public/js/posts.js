@@ -335,8 +335,6 @@ window.addEventListener("load", () => {
       );
     }
 
-    console.log({ ...appliedFilters });
-
     // Handle Photo Filter
     if (justPhotoController.checked) {
       filteredPosts = filteredPosts.filter((post) => post.pics.length !== 0);

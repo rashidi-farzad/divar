@@ -1,4 +1,7 @@
-import { getAndShowSocials } from "../../utils/shared.js";
+import {
+  getAndShowHeaderCityLocation,
+  getAndShowSocials,
+} from "../../utils/shared.js";
 import {
   addParamToUrl,
   getUrlParam,
@@ -8,6 +11,7 @@ import {
 
 window.addEventListener("load", () => {
   getAndShowSocials();
+  getAndShowHeaderCityLocation();
 
   const globalSearchInput = document.querySelector("#global_search_input");
   const mostSearchedContainer = document.querySelector("#most_searched");
