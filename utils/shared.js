@@ -21,18 +21,21 @@ const getAndShowSocials = async () => {
         <a href="${social.link}" class="sidebar__icon-link">
             <img width="18px" height="18px" alt="${social.name}" src="${social.icon}" class="sidebar__icon bi bi-twitter" />
         </a>
-      `
+      `,
     );
   });
 };
 
 const getPosts = async (citiesIDs) => {
   const categoryID = getUrlParam("categoryID");
+  const searchValue = getUrlParam("value");
   let url = `${baseUrl}/v1/post/?city=${citiesIDs}`;
 
-  console.log("categoryID ->", categoryID);
   if (categoryID) {
     url += `&categoryId=${categoryID}`;
+  }
+  if (searchValue) {
+    url += `&search=${searchValue}`;
   }
 
   const res = await fetch(url);

@@ -1,10 +1,16 @@
 import { getAndShowSocials } from "../../utils/shared.js";
-import { addParamToUrl } from "../../utils/utils.js";
+import { addParamToUrl, hideModal, showModal } from "../../utils/utils.js";
 
 window.addEventListener("load", () => {
   getAndShowSocials();
 
   const globalSearchInput = document.querySelector("#global_search_input");
+  const mostSearchedContainer = document.querySelector("#most_searched");
+  const searchbarModalOverlay = document.querySelector(
+    ".searchbar__modal-overlay",
+  );
+
+  const mostSearchKeyWords = ["ماشین", "ساعت", "موبایل", "لپ تاپ", "موس"];
 
   globalSearchInput?.addEventListener("keyup", (event) => {
     if (event.keyCode === 13) {
@@ -14,5 +20,29 @@ window.addEventListener("load", () => {
         addParamToUrl("value", event.target.value.trim());
       }
     }
+  });
+
+  mostSearchKeyWords.forEach((keyword) => {
+    mostSearchedContainer.insertAdjacentHTML(
+      "beforeend",
+      `
+      <li class="header__searchbar-dropdown-item">
+        <a href="posts.html?value=${keyword}" class="header__searchbar-dropdown-link">${keyword}</a>
+      </li>
+      `,
+    );
+  });
+
+  globalSearchInput?.addEventListener("click", () => {
+    showModal(
+      "header__searchbar-dropdown",
+      "header__searchbar-dropdown--active",
+    );
+  });
+  searchbarModalOverlay?.addEventListener("click", () => {
+    hideModal(
+      "header__searchbar-dropdown",
+      "header__searchbar-dropdown--active",
+    );
   });
 });
