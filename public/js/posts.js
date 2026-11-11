@@ -14,6 +14,8 @@ window.addEventListener("load", () => {
 
   const cities = getFromLocalStorage("cities");
 
+  const citiesIDs = cities.map((city) => city.id).join("|");
+
   let posts = null;
   let backupPosts = null;
   let appliedFilters = {};
@@ -24,7 +26,7 @@ window.addEventListener("load", () => {
     document.title = `دیوار ${cities.length} شهر - آگهی های رایگان خرید، فروش و استخدام | دیوار`;
   }
 
-  getPosts(cities[0].id).then((response) => {
+  getPosts(citiesIDs).then((response) => {
     loadingContainer.style.display = "none";
 
     posts = response.data.posts;
