@@ -9,6 +9,7 @@ import {
   getFromLocalStorage,
   hideModal,
   showModal,
+  saveInLocalStorage,
 } from "../../utils/utils.js";
 
 window.addEventListener("load", () => {
@@ -23,6 +24,9 @@ window.addEventListener("load", () => {
   const headerCity = document.querySelector(".header__city");
   const deleteAllSelectedCities = document.querySelector("#delete-all-cities");
   const citiesModalList = document.querySelector("#city_modal_list");
+  const cityModalAcceptBtn = document.querySelector(".city-modal__accept");
+  const cityModalCloseBtn = document.querySelector(".city-modal__close");
+  const cityModalError = document.querySelector("#city_modal_error");
   const searchbarModalOverlay = document.querySelector(
     ".searchbar__modal-overlay",
   );
@@ -68,18 +72,18 @@ window.addEventListener("load", () => {
   };
 
   getAllLocations().then((data) => {
-    allCities = data.provinces;
-    console.log(allCities);
+    allCities = data;
 
     showProvinces(allCities);
   });
 
-  const showProvinces = (cities) => {
-    cities.forEach((province) => {
+  const showProvinces = (data) => {
+    citiesModalList.innerHTML = "";
+    data.provinces.forEach((province) => {
       citiesModalList.insertAdjacentHTML(
         "beforeend",
         `
-        <li
+          <li
             class="city-modal__cities-item province-item"
             data-province-id="${province.id}"
           >
@@ -89,10 +93,130 @@ window.addEventListener("load", () => {
         `,
       );
     });
+
+    const provinceItems = document.querySelectorAll(".province-item");
+
+    provinceItems.forEach((province) => {
+      province.addEventListener("click", (event) => {
+        const provinceID = event.target.dataset.provinceId;
+        const provinceName = event.target.querySelector("span").innerHTML;
+
+        citiesModalList.innerHTML = "";
+
+        citiesModalList.insertAdjacentHTML(
+          "beforeend",
+          `
+            <li id="city_modal_all_province" class="city_modal_all_province">
+              <span>همه شهر ها</span>
+              <i class="bi bi-arrow-right-short"></i>
+            </li>
+            <li class="city-modal__cities-item select-all-city city-item">
+              <span>همه شهر های ${provinceName} </span>
+              <div id="checkboxShape"></div>
+              <input type="checkbox" />
+            </li>
+          `,
+        );
+
+        const provinceCities = data.cities.filter(
+          (city) => city.province_id === Number(provinceID),
+        );
+
+        provinceCities.forEach((city) => {
+          const isSelect = selectedCities.some(
+            (selectedCity) => selectedCity.title === city.name,
+          );
+
+          citiesModalList.insertAdjacentHTML(
+            "beforeend",
+            `
+              <li class="city-modal__cities-item city-item" id="city-${
+                city.id
+              }">
+                <span>${city.name}</span>
+                <div id="checkboxShape" class="${isSelect && "active"}"></div>
+                <input onchange="cityItemClickHandler('${
+                  city.id
+                }')" id="city-item-checkbox" type="checkbox" checked="${isSelect}" />
+              </li>
+            `,
+          );
+        });
+
+        const cityModalAllProvinces = document.querySelector(
+          "#city_modal_all_province",
+        );
+
+        cityModalAllProvinces.addEventListener("click", () => {
+          citiesModalList.innerHTML = "";
+          showProvinces(data);
+        });
+      });
+    });
+  };
+
+  window.cityItemClickHandler = (cityID) => {
+    const cityElement = document.querySelector(`#city-${cityID}`);
+    const checkbox = cityElement.querySelector("input");
+    const cityTitle = cityElement.querySelector("span").innerHTML;
+    const checkboxShape = cityElement.querySelector("div");
+
+    selectedCities.forEach((city) => {
+      if (city.title === cityTitle) {
+        checkbox.checked = true;
+        checkboxShape.classList.add("active");
+      }
+    });
+
+    checkbox.checked = !checkbox.checked;
+
+    if (checkbox.checked) {
+      updateSelectedCities(cityTitle, cityID);
+      checkboxShape.classList.add("active");
+    } else {
+      selectedCities = selectedCities.filter(
+        (city) => city.title !== cityTitle,
+      );
+      checkbox.checked = true;
+      checkboxShape.classList.remove("active");
+      addCityToModal(selectedCities);
+      toggleCityModalBtns(selectedCities);
+    }
+  };
+
+  const toggleCityModalBtns = (cities) => {
+    if (cities.length) {
+      cityModalAcceptBtn.classList.replace(
+        "city-modal__accept",
+        "city-modal__accept--active",
+      );
+      deleteAllSelectedCities.style.display = "block";
+      cityModalError.style.display = "none";
+    } else {
+      cityModalAcceptBtn.classList.replace(
+        "city-modal__accept--active",
+        "city-modal__accept",
+      );
+      deleteAllSelectedCities.style.display = "none";
+      cityModalError.style.display = "block";
+    }
+  };
+
+  const updateSelectedCities = (cityTitle, cityID) => {
+    const isTitleRepeated = selectedCities.some(
+      (city) => city.title === cityTitle,
+    );
+
+    if (!isTitleRepeated) {
+      selectedCities.push({ title: cityTitle, id: cityID });
+      toggleCityModalBtns(selectedCities);
+      addCityToModal(selectedCities);
+    }
   };
 
   const addCityToModal = (cities) => {
     const citySelected = document.querySelector("#city-selected");
+    citySelected.innerHTML = "";
     cities.forEach((city) => {
       citySelected.insertAdjacentHTML(
         "beforeend",
@@ -120,5 +244,22 @@ window.addEventListener("load", () => {
       "header__searchbar-dropdown",
       "header__searchbar-dropdown--active",
     );
+  });
+
+  cityModalAcceptBtn?.addEventListener("click", () => {
+    saveInLocalStorage("cities", selectedCities);
+    const citiesIDs = selectedCities.map((city) => city.id).join("|");
+    addParamToUrl("cities", citiesIDs);
+    getAndShowHeaderCityLocation();
+    hideModal("city-modal", "city-modal--active");
+    showProvinces(allCities);
+  });
+  cityModalCloseBtn?.addEventListener("click", () => {
+    hideModal("city-modal", "city-modal--active");
+    cityModalAcceptBtn.classList.replace(
+      "city-modal__accept--active",
+      "city-modal__accept",
+    );
+    showProvinces(allCities);
   });
 });

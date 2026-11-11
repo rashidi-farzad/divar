@@ -16,8 +16,6 @@ const getAllCities = async () => {
 const getAllLocations = async () => {
   const res = await fetch(`${baseUrl}/v1/location`);
   const response = await res.json();
-  console.log(response);
-
   return response.data;
 };
 
