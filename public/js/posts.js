@@ -18,6 +18,12 @@ window.addEventListener("load", () => {
   let backupPosts = null;
   let appliedFilters = {};
 
+  if (cities.length === 1) {
+    document.title = `دیوار ${cities[0].title} شهر - آگهی های رایگان خرید، فروش و استخدام | دیوار`;
+  } else {
+    document.title = `دیوار ${cities.length} شهر - آگهی های رایگان خرید، فروش و استخدام | دیوار`;
+  }
+
   getPosts(cities[0].id).then((response) => {
     loadingContainer.style.display = "none";
 
