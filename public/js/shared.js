@@ -27,6 +27,7 @@ window.addEventListener("load", () => {
   const cityModalAcceptBtn = document.querySelector(".city-modal__accept");
   const cityModalCloseBtn = document.querySelector(".city-modal__close");
   const cityModalError = document.querySelector("#city_modal_error");
+  const cityModalOverlay = document.querySelector(".city-modal__overlay");
   const searchbarModalOverlay = document.querySelector(
     ".searchbar__modal-overlay",
   );
@@ -67,8 +68,19 @@ window.addEventListener("load", () => {
   });
 
   window.removeCityFromModal = (cityID) => {
-    // Codes
-    console.log("cityID => ", cityID);
+    const currentCity = document.querySelector(`#city-${cityID}`);
+
+    if (currentCity) {
+      const checkbox = currentCity.querySelector("input");
+      const checkboxShape = currentCity.querySelector("div");
+
+      checkbox.checked = false;
+      checkboxShape.classList.remove("active");
+    }
+
+    selectedCities = selectedCities.filter((city) => city.id !== cityID);
+    addCityToModal(selectedCities);
+    toggleCityModalBtns(selectedCities);
   };
 
   getAllLocations().then((data) => {
@@ -214,6 +226,28 @@ window.addEventListener("load", () => {
     }
   };
 
+  deleteAllSelectedCities?.addEventListener("click", () => {
+    unSelectCitiesFromModal();
+    selectedCities = [];
+    addCityToModal(selectedCities);
+    cityModalAcceptBtn.classList.replace(
+      "city-modal__accept--active",
+      "city-modal__accept",
+    );
+    cityModalError.style.display = "block";
+    deleteAllSelectedCities.style.display = "none";
+  });
+
+  const unSelectCitiesFromModal = () => {
+    const cityElemets = document.querySelectorAll(".city-item");
+    cityElemets.forEach((city) => {
+      const checkbox = city.querySelector("input");
+      const checkboxShape = city.querySelector("div");
+      checkbox.checked = false;
+      checkboxShape.classList.remove("active");
+    });
+  };
+
   const addCityToModal = (cities) => {
     const citySelected = document.querySelector("#city-selected");
     citySelected.innerHTML = "";
@@ -254,12 +288,24 @@ window.addEventListener("load", () => {
     hideModal("city-modal", "city-modal--active");
     showProvinces(allCities);
   });
+
   cityModalCloseBtn?.addEventListener("click", () => {
     hideModal("city-modal", "city-modal--active");
     cityModalAcceptBtn.classList.replace(
       "city-modal__accept--active",
       "city-modal__accept",
     );
+    showProvinces(allCities);
+  });
+
+  cityModalOverlay?.addEventListener("click", () => {
+    hideModal("city-modal", "city-modal--active");
+
+    cityModalAcceptBtn.classList.replace(
+      "city-modal__accept--active",
+      "city-modal__accept",
+    );
+
     showProvinces(allCities);
   });
 });
