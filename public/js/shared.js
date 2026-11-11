@@ -28,6 +28,7 @@ window.addEventListener("load", () => {
   const cityModalCloseBtn = document.querySelector(".city-modal__close");
   const cityModalError = document.querySelector("#city_modal_error");
   const cityModalOverlay = document.querySelector(".city-modal__overlay");
+  const cityModalCities = document.querySelector(".city-modal__cities");
   const searchbarModalOverlay = document.querySelector(
     ".searchbar__modal-overlay",
   );
@@ -91,6 +92,9 @@ window.addEventListener("load", () => {
 
   const showProvinces = (data) => {
     citiesModalList.innerHTML = "";
+
+    cityModalCities.scrollTo(0, 0);
+
     data.provinces.forEach((province) => {
       citiesModalList.insertAdjacentHTML(
         "beforeend",
