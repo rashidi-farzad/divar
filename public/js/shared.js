@@ -2,6 +2,7 @@ import {
   getAndShowHeaderCityLocation,
   getAndShowSocials,
   getAllLocations,
+  getPostCategories,
 } from "../../utils/shared.js";
 import {
   addParamToUrl,
@@ -10,6 +11,7 @@ import {
   hideModal,
   showModal,
   saveInLocalStorage,
+  removeParamFromUrl,
 } from "../../utils/utils.js";
 
 window.addEventListener("load", () => {
@@ -29,7 +31,14 @@ window.addEventListener("load", () => {
   const cityModalError = document.querySelector("#city_modal_error");
   const cityModalOverlay = document.querySelector(".city-modal__overlay");
   const cityModalCities = document.querySelector(".city-modal__cities");
-  const selectAllCitiesBtn = document.querySelector(".select-all-city");
+  const headerCategoryBtn = document.querySelector(".header__category-btn");
+  const allCategoriesPosts = document.querySelector("#all-categories-posts");
+  const categoriesList = document.querySelector("#categories-list");
+  const categoryResults = document.querySelector("#category-results");
+
+  const categoryModalOverlay = document.querySelector(
+    ".category_modal_overlay",
+  );
   const cityModalSearchInput = document.querySelector(
     "#city-modal-search-input",
   );
@@ -38,6 +47,63 @@ window.addEventListener("load", () => {
   );
 
   const mostSearchKeyWords = ["ماشین", "ساعت", "موبایل", "لپ تاپ", "موس"];
+
+  getPostCategories().then((categories) => {
+    categories.forEach((category) => {
+      categoriesList.insertAdjacentHTML(
+        "beforeend",
+        `
+         <li class="header__category-menu-item" onmouseenter="showActiveCategorySubs('${category._id}')">
+            <div class="header__category-menu-link">
+              <div class="header__category-menu-link-right">
+                <i class="header__category-menu-icon bi bi-house"></i>
+                ${category.title}
+              </div>
+              <div class="header__category-menu-link-left">
+                <i class="header__category-menu-arrow-icon bi bi-chevron-left"></i>
+              </div>
+            </div>
+          </li>
+        `,
+      );
+    });
+    window.showActiveCategorySubs = (categoryID) => {
+      const category = categories.find(
+        (category) => category._id === categoryID,
+      );
+
+      categoryResults.innerHTML = "";
+
+      category.subCategories.map((subCategory) => {
+        categoryResults.insertAdjacentHTML(
+          "beforeend",
+          `
+            <div>
+              <ul class="header__category-dropdown-list">
+                <div class="header__category-dropdown-title" onclick="categoryClickHandler('${
+                  subCategory._id
+                }')">${subCategory.title}</div>
+                ${subCategory.subCategories
+                  .map(
+                    (subSubCategory) => `
+                    <li class="header__category-dropdown-item">
+                      <div onclick="categoryClickHandler('${subSubCategory._id}')" class="header__category-dropdown-link">${subSubCategory.title}</div>
+                    </li>
+                  `,
+                  )
+                  .join("")}
+              </ul>
+            </div>
+          `,
+        );
+      });
+    };
+    showActiveCategorySubs(categories[0]._id);
+
+    window.categoryClickHandler = function (categoryID) {
+      addParamToUrl("categoryID", categoryID);
+    };
+  });
 
   globalSearchInput?.addEventListener("keyup", (event) => {
     if (event.keyCode === 13) {
@@ -386,5 +452,17 @@ window.addEventListener("load", () => {
       citiesModalList.innerHTML = "";
       showProvinces(allCities);
     }
+  });
+
+  headerCategoryBtn?.addEventListener("click", () => {
+    showModal("header__category-menu", "header__category-menu--active");
+  });
+
+  categoryModalOverlay?.addEventListener("click", () => {
+    hideModal("header__category-menu", "header__category-menu--active");
+  });
+
+  allCategoriesPosts?.addEventListener("click", () => {
+    removeParamFromUrl("categoryID");
   });
 });
