@@ -79,6 +79,13 @@ const getPostCategories = async () => {
   return response.data.categories;
 };
 
+const getPostDetails = async () => {
+  const postID = getUrlParam("id");
+  const res = await fetch(`${baseUrl}/v1/post/${postID}`);
+  const response = await res.json();
+  return response.data.post;
+};
+
 export {
   baseUrl,
   getAllCities,
@@ -87,4 +94,5 @@ export {
   getPostCategories,
   getAndShowHeaderCityLocation,
   getAllLocations,
+  getPostDetails,
 };
