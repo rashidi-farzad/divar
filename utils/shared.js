@@ -15,8 +15,9 @@ const getAllCities = async () => {
 
 const getAllLocations = async () => {
   const res = await fetch(`${baseUrl}/v1/location`);
-  const response = await res.json();
-  return response.data;
+  const respose = await res.json();
+
+  return respose.data;
 };
 
 const getAndShowSocials = async () => {
@@ -31,7 +32,7 @@ const getAndShowSocials = async () => {
         <a href="${social.link}" class="sidebar__icon-link">
             <img width="18px" height="18px" alt="${social.name}" src="${social.icon}" class="sidebar__icon bi bi-twitter" />
         </a>
-      `,
+      `
     );
   });
 };
@@ -39,16 +40,17 @@ const getAndShowSocials = async () => {
 const getAndShowHeaderCityLocation = async () => {
   const headerCityTitle = document.querySelector("#header-city-title");
   const cities = getFromLocalStorage("cities");
+
   if (headerCityTitle) {
     if (!cities) {
       saveInLocalStorage("cities", [{ title: "تهران", id: 301 }]);
       const cities = getFromLocalStorage("cities");
-      headerCityTitle.textContent = cities[0].title;
+      headerCityTitle.innerHTML = cities[0].title;
     } else {
       if (cities.length === 1) {
-        headerCityTitle.textContent = cities[0].title;
+        headerCityTitle.innerHTML = cities[0].title;
       } else {
-        headerCityTitle.textContent = `${cities.length} شهر`;
+        headerCityTitle.innerHTML = `${cities.length} شهر`;
       }
     }
   }
@@ -62,6 +64,7 @@ const getPosts = async (citiesIDs) => {
   if (categoryID) {
     url += `&categoryId=${categoryID}`;
   }
+
   if (searchValue) {
     url += `&search=${searchValue}`;
   }
@@ -81,18 +84,20 @@ const getPostCategories = async () => {
 
 const getPostDetails = async () => {
   const postID = getUrlParam("id");
+
   const res = await fetch(`${baseUrl}/v1/post/${postID}`);
   const response = await res.json();
+
   return response.data.post;
 };
 
 export {
   baseUrl,
   getAllCities,
+  getAllLocations,
   getAndShowSocials,
   getPosts,
   getPostCategories,
   getAndShowHeaderCityLocation,
-  getAllLocations,
   getPostDetails,
 };

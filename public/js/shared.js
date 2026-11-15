@@ -1,17 +1,17 @@
 import {
+  getAllLocations,
   getAndShowHeaderCityLocation,
   getAndShowSocials,
-  getAllLocations,
   getPostCategories,
 } from "../../utils/shared.js";
 import {
   addParamToUrl,
-  getUrlParam,
   getFromLocalStorage,
+  getUrlParam,
   hideModal,
-  showModal,
-  saveInLocalStorage,
   removeParamFromUrl,
+  saveInLocalStorage,
+  showModal,
 } from "../../utils/utils.js";
 
 window.addEventListener("load", () => {
@@ -36,24 +36,14 @@ window.addEventListener("load", () => {
   const categoriesList = document.querySelector("#categories-list");
   const categoryResults = document.querySelector("#category-results");
 
-  const categoryModalOverlay = document.querySelector(
-    ".category_modal_overlay",
-  );
-  const cityModalSearchInput = document.querySelector(
-    "#city-modal-search-input",
-  );
-  const searchbarModalOverlay = document.querySelector(
-    ".searchbar__modal-overlay",
-  );
-
-  const mostSearchKeyWords = ["ماشین", "ساعت", "موبایل", "لپ تاپ", "موس"];
-
   getPostCategories().then((categories) => {
+    console.log("Categories ->", categories);
+
     categories.forEach((category) => {
       categoriesList.insertAdjacentHTML(
         "beforeend",
         `
-         <li class="header__category-menu-item" onmouseenter="showActiveCategorySubs('${category._id}')">
+          <li class="header__category-menu-item" onmouseenter="showActiveCategorySubs('${category._id}')">
             <div class="header__category-menu-link">
               <div class="header__category-menu-link-right">
                 <i class="header__category-menu-icon bi bi-house"></i>
@@ -64,12 +54,13 @@ window.addEventListener("load", () => {
               </div>
             </div>
           </li>
-        `,
+        `
       );
     });
+
     window.showActiveCategorySubs = (categoryID) => {
       const category = categories.find(
-        (category) => category._id === categoryID,
+        (category) => category._id === categoryID
       );
 
       categoryResults.innerHTML = "";
@@ -89,21 +80,36 @@ window.addEventListener("load", () => {
                     <li class="header__category-dropdown-item">
                       <div onclick="categoryClickHandler('${subSubCategory._id}')" class="header__category-dropdown-link">${subSubCategory.title}</div>
                     </li>
-                  `,
+                  `
                   )
                   .join("")}
               </ul>
             </div>
-          `,
+          `
         );
       });
     };
+
     showActiveCategorySubs(categories[0]._id);
 
     window.categoryClickHandler = function (categoryID) {
       addParamToUrl("categoryID", categoryID);
     };
   });
+
+  const categoryModalOverlay = document.querySelector(
+    ".category_modal_overlay"
+  );
+
+  const cityModalSearchInput = document.querySelector(
+    "#city-modal-search-input"
+  );
+
+  const searchbarModalOverlay = document.querySelector(
+    ".searchbar__modal-overlay"
+  );
+
+  const mostSearchKeyWords = ["ماشین", "ساعت", "موبایل", "لپ تاپ", "تلویزیون"];
 
   globalSearchInput?.addEventListener("keyup", (event) => {
     if (event.keyCode === 13) {
@@ -118,15 +124,17 @@ window.addEventListener("load", () => {
   mostSearchKeyWords.forEach((keyword) => {
     const categoryID = getUrlParam("categoryID");
 
-    let href = `posts.html?value=${keyword}${categoryID ? `&categoryID=${categoryID}` : ""}`;
+    let href = `posts.html?value=${keyword}${
+      categoryID ? `&categoryID=${categoryID}` : ""
+    }`;
 
     mostSearchedContainer.insertAdjacentHTML(
       "beforeend",
       `
-      <li class="header__searchbar-dropdown-item">
-        <a href="${href}" class="header__searchbar-dropdown-link">${keyword}</a>
-      </li>
-      `,
+        <li class="header__searchbar-dropdown-item">
+          <a href="${href}" class="header__searchbar-dropdown-link">${keyword}</a>
+        </li>
+      `
     );
   });
 
@@ -135,8 +143,29 @@ window.addEventListener("load", () => {
     const cities = getFromLocalStorage("cities");
     selectedCities = cities;
     deleteAllSelectedCities.style.display = "block";
+
     addCityToModal(selectedCities);
   });
+
+  const addCityToModal = (cities) => {
+    const citySelected = document.querySelector("#city-selected");
+
+    citySelected.innerHTML = "";
+
+    cities.forEach((city) => {
+      citySelected.insertAdjacentHTML(
+        "beforeend",
+        `
+          <div class="city-modal__selected-item">
+            <span class="city-modal__selected-text">${city.title}</span>
+            <button class="city-modal__selected-btn" onclick="removeCityFromModal('${city.id}')">
+              <i class="city-modal__selected-icon bi bi-x"></i>
+            </button>
+          </div>
+        `
+      );
+    });
+  };
 
   window.removeCityFromModal = (cityID) => {
     const currentCity = document.querySelector(`#city-${cityID}`);
@@ -156,13 +185,11 @@ window.addEventListener("load", () => {
 
   getAllLocations().then((data) => {
     allCities = data;
-
     showProvinces(allCities);
   });
 
   const showProvinces = (data) => {
     citiesModalList.innerHTML = "";
-
     cityModalCities.scrollTo(0, 0);
 
     data.provinces.forEach((province) => {
@@ -176,7 +203,7 @@ window.addEventListener("load", () => {
             <span>${province.name}</span>
             <i class="city-modal__cities-icon bi bi-chevron-left"></i>
           </li>
-        `,
+        `
       );
     });
 
@@ -201,16 +228,16 @@ window.addEventListener("load", () => {
               <div id="checkboxShape"></div>
               <input type="checkbox" />
             </li>
-          `,
+          `
         );
 
         const provinceCities = data.cities.filter(
-          (city) => city.province_id === Number(provinceID),
+          (city) => city.province_id === Number(provinceID)
         );
 
         provinceCities.forEach((city) => {
           const isSelect = selectedCities.some(
-            (selectedCity) => selectedCity.title === city.name,
+            (selectedCity) => selectedCity.title === city.name
           );
 
           citiesModalList.insertAdjacentHTML(
@@ -225,12 +252,12 @@ window.addEventListener("load", () => {
                   city.id
                 }')" id="city-item-checkbox" type="checkbox" checked="${isSelect}" />
               </li>
-            `,
+            `
           );
         });
 
         const cityModalAllProvinces = document.querySelector(
-          "#city_modal_all_province",
+          "#city_modal_all_province"
         );
 
         cityModalAllProvinces.addEventListener("click", () => {
@@ -261,7 +288,7 @@ window.addEventListener("load", () => {
       checkboxShape.classList.add("active");
     } else {
       selectedCities = selectedCities.filter(
-        (city) => city.title !== cityTitle,
+        (city) => city.title !== cityTitle
       );
       checkbox.checked = true;
       checkboxShape.classList.remove("active");
@@ -274,15 +301,17 @@ window.addEventListener("load", () => {
     if (cities.length) {
       cityModalAcceptBtn.classList.replace(
         "city-modal__accept",
-        "city-modal__accept--active",
+        "city-modal__accept--active"
       );
+
       deleteAllSelectedCities.style.display = "block";
       cityModalError.style.display = "none";
     } else {
       cityModalAcceptBtn.classList.replace(
         "city-modal__accept--active",
-        "city-modal__accept",
+        "city-modal__accept"
       );
+
       deleteAllSelectedCities.style.display = "none";
       cityModalError.style.display = "block";
     }
@@ -290,7 +319,7 @@ window.addEventListener("load", () => {
 
   const updateSelectedCities = (cityTitle, cityID) => {
     const isTitleRepeated = selectedCities.some(
-      (city) => city.title === cityTitle,
+      (city) => city.title === cityTitle
     );
 
     if (!isTitleRepeated) {
@@ -301,98 +330,42 @@ window.addEventListener("load", () => {
   };
 
   deleteAllSelectedCities?.addEventListener("click", () => {
-    unSelectCitiesFromModal();
+    deSelectAllCitiesFromModal();
     selectedCities = [];
     addCityToModal(selectedCities);
+
     cityModalAcceptBtn.classList.replace(
       "city-modal__accept--active",
-      "city-modal__accept",
+      "city-modal__accept"
     );
+
     cityModalError.style.display = "block";
     deleteAllSelectedCities.style.display = "none";
   });
 
-  const unSelectCitiesFromModal = () => {
-    const cityElemets = document.querySelectorAll(".city-item");
-    cityElemets.forEach((city) => {
-      const checkbox = city.querySelector("input");
-      const checkboxShape = city.querySelector("div");
-      checkbox.checked = false;
-      checkboxShape.classList.remove("active");
-    });
-  };
-
-  // Handle Select All Cities Btn
-  citiesModalList.addEventListener("click", (event) => {
-    const selectAllBtn = event.target.closest(".select-all-city");
-
-    if (!selectAllBtn) return;
-
-    const cityElements = citiesModalList.querySelectorAll(
-      ".city-item:not(.select-all-city)",
-    );
+  const deSelectAllCitiesFromModal = () => {
+    const cityElements = document.querySelectorAll(".city-item");
 
     cityElements.forEach((city) => {
       const checkbox = city.querySelector("input");
       const checkboxShape = city.querySelector("div");
 
-      const cityTitle = city.querySelector("span").innerHTML;
-      const cityID = city.id.replace("city-", "");
-
-      checkbox.checked = true;
-      checkboxShape.classList.add("active");
-
-      const isRepeated = selectedCities.some(
-        (selectedCity) => String(selectedCity.id) === cityID,
-      );
-
-      if (!isRepeated) {
-        selectedCities.push({
-          title: cityTitle,
-          id: cityID,
-        });
-      }
-    });
-
-    const checkbox = selectAllBtn.querySelector("input");
-    const checkboxShape = selectAllBtn.querySelector("div");
-
-    checkbox.checked = true;
-    checkboxShape.classList.add("active");
-
-    addCityToModal(selectedCities);
-    toggleCityModalBtns(selectedCities);
-  });
-
-  const addCityToModal = (cities) => {
-    const citySelected = document.querySelector("#city-selected");
-    citySelected.innerHTML = "";
-    cities.forEach((city) => {
-      citySelected.insertAdjacentHTML(
-        "beforeend",
-        `
-          <div class="city-modal__selected-item">
-            <span class="city-modal__selected-text">${city.title}</span>
-              <button class="city-modal__selected-btn" onclick="removeCityFromModal('${city.id}')">
-                <i class="city-modal__selected-icon bi bi-x"></i>
-              </button>
-          </div>
-        `,
-      );
+      checkbox.checked = false;
+      checkboxShape.classList.remove("active");
     });
   };
 
   globalSearchInput?.addEventListener("click", () => {
     showModal(
       "header__searchbar-dropdown",
-      "header__searchbar-dropdown--active",
+      "header__searchbar-dropdown--active"
     );
   });
 
   searchbarModalOverlay?.addEventListener("click", () => {
     hideModal(
       "header__searchbar-dropdown",
-      "header__searchbar-dropdown--active",
+      "header__searchbar-dropdown--active"
     );
   });
 
@@ -407,10 +380,12 @@ window.addEventListener("load", () => {
 
   cityModalCloseBtn?.addEventListener("click", () => {
     hideModal("city-modal", "city-modal--active");
+
     cityModalAcceptBtn.classList.replace(
       "city-modal__accept--active",
-      "city-modal__accept",
+      "city-modal__accept"
     );
+
     showProvinces(allCities);
   });
 
@@ -419,33 +394,36 @@ window.addEventListener("load", () => {
 
     cityModalAcceptBtn.classList.replace(
       "city-modal__accept--active",
-      "city-modal__accept",
+      "city-modal__accept"
     );
 
     showProvinces(allCities);
   });
 
   cityModalSearchInput?.addEventListener("keyup", (event) => {
+    console.log(event.target.value);
     const filteredCities = allCities.cities.filter((city) =>
-      city.name.startsWith(event.target.value),
+      city.name.includes(event.target.value)
     );
+
     if (event.target.value.trim() && filteredCities.length) {
       citiesModalList.innerHTML = "";
-
       filteredCities.forEach((city) => {
-        const isSelected = selectedCities.some(
-          (selectedCity) => selectedCity.title === city.name,
+        const isSelect = selectedCities.some(
+          (selectedCity) => selectedCity.title === city.name
         );
 
         citiesModalList.insertAdjacentHTML(
           "beforeend",
           `
-              <li class="city-modal__cities-item city-item" id="city-${city.id}">
-                <span>${city.name}</span>
-                <div id="checkboxShape" class="${isSelected && "active"}"></div>
-                <input onchange="cityItemClickHandler('${city.id}')" id="city-item-checkbox" type="checkbox" checked="${isSelected}">
-              </li>
-          `,
+            <li class="city-modal__cities-item city-item" id="city-${city.id}">
+              <span>${city.name}</span>
+              <div id="checkboxShape" class="${isSelect && "active"}"></div>
+              <input onchange="cityItemClickHandler('${
+                city.id
+              }')" id="city-item-checkbox" type="checkbox" checked="${isSelect}">
+            </li>
+          `
         );
       });
     } else {

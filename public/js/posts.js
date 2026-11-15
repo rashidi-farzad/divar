@@ -13,17 +13,16 @@ window.addEventListener("load", () => {
   const loadingContainer = document.querySelector("#loading-container");
 
   const cities = getFromLocalStorage("cities");
-
   const citiesIDs = cities.map((city) => city.id).join("|");
 
   let posts = null;
   let backupPosts = null;
-  let appliedFilters = {};
+  let appliedFilters = {}; // key-value karkard: 90 / tolid: 1396
 
   if (cities.length === 1) {
-    document.title = `دیوار ${cities[0].title} شهر - آگهی های رایگان خرید، فروش و استخدام | دیوار`;
+    document.title = `دیوار ${cities[0].title} - نیازمندی‌ های رایگان، آگهی‌های خرید، فروش نو و دست دوم و کارکرده، استخدام و خدمات`;
   } else {
-    document.title = `دیوار ${cities.length} شهر - آگهی های رایگان خرید، فروش و استخدام | دیوار`;
+    document.title = `دیوار ${cities.length} شهر - نیازمندی‌ های رایگان، آگهی‌های خرید، فروش نو و دست دوم و کارکرده، استخدام و خدمات`;
   }
 
   getPosts(citiesIDs).then((response) => {
@@ -32,13 +31,17 @@ window.addEventListener("load", () => {
     posts = response.data.posts;
     backupPosts = response.data.posts;
 
+    console.log("Posts ->", posts);
+
     generatePosts(posts);
   });
 
   const generatePosts = (posts) => {
     const postsContainer = document.querySelector("#posts-container");
+
     postsContainer.innerHTML = "";
-    if (posts.length) {
+
+    if (posts?.length) {
       posts.forEach((post) => {
         const date = calcuteRelativeTimeDifference(post.createdAt);
         postsContainer.insertAdjacentHTML(
@@ -83,7 +86,7 @@ window.addEventListener("load", () => {
               </a>
             </div>
         
-          `,
+          `
         );
       });
     } else {
@@ -107,7 +110,7 @@ window.addEventListener("load", () => {
 
     if (categoryID) {
       const categoryInfos = categories.filter(
-        (category) => category._id === categoryID,
+        (category) => category._id === categoryID
       );
 
       if (!categoryInfos.length) {
@@ -138,13 +141,13 @@ window.addEventListener("load", () => {
                       .join("")}
                   </ul>
                 </div>
-            `,
+            `
           );
         } else {
           const subSubCategory = findSubSubCategoryById(categories, categoryID);
           const subSubCategoryParent = findSubCategoryById(
             categories,
-            subSubCategory.parent,
+            subSubCategory.parent
           );
 
           subSubCategory?.filters.forEach((filter) => filterGenerator(filter));
@@ -169,7 +172,7 @@ window.addEventListener("load", () => {
                     .join("")}
                 </ul>
               </div>
-            `,
+            `
           );
         }
       } else {
@@ -192,7 +195,7 @@ window.addEventListener("load", () => {
                 </ul>
               </div>
           
-            `,
+            `
           );
         });
       }
@@ -207,7 +210,7 @@ window.addEventListener("load", () => {
                 <p>${category.title}</p>
               </div>
             </div>
-          `,
+          `
         );
       });
     }
@@ -225,29 +228,30 @@ window.addEventListener("load", () => {
 
   const findSubCategoryById = (categories, categoryID) => {
     const allSubCategories = categories.flatMap(
-      (category) => category.subCategories,
+      (category) => category.subCategories
     );
 
     return allSubCategories.find(
-      (subCategory) => subCategory._id === categoryID,
+      (subCategory) => subCategory._id === categoryID
     );
   };
 
   const findSubSubCategoryById = (categories, categoryID) => {
     const allSubCategories = categories.flatMap(
-      (category) => category.subCategories,
+      (category) => category.subCategories
     );
 
     const allSubSubCategories = allSubCategories.flatMap(
-      (subCategory) => subCategory.subCategories,
+      (subCategory) => subCategory.subCategories
     );
 
     return allSubSubCategories.find(
-      (subSubCategory) => subSubCategory._id === categoryID,
+      (subSubCategory) => subSubCategory._id === categoryID
     );
   };
 
   const filterGenerator = (filter) => {
+    console.log("Filter ->", filter);
     const sidebarFiltersContainer = document.querySelector("#sidebar-filters");
 
     sidebarFiltersContainer.insertAdjacentHTML(
@@ -279,12 +283,14 @@ window.addEventListener("load", () => {
                       data-bs-parent="#accordionFlushExample"
                     >
                       <div class="accordion-body">
-                        <select class="selectbox" onchange="selectBoxFilterHandler(event.target.value,'${filter.slug}')">
+                        <select class="selectbox" onchange="selectBoxFilterHandler(event.target.value, '${
+                          filter.slug
+                        }')">
                           ${filter.options
                             .sort((a, b) => b - a)
                             .map(
                               (option) =>
-                                `<option value='${option}'>${option}</option>`,
+                                `<option value='${option}'>${option}</option>`
                             )}
                         </select>
                       </div>
@@ -308,12 +314,12 @@ window.addEventListener("load", () => {
               `
             : ""
         }
-      `,
+      `
     );
   };
 
   const removeSearchValueIcon = document.querySelector(
-    "#remove-search-value-icon",
+    "#remove-search-value-icon"
   );
 
   if (searchValue) {
@@ -328,38 +334,37 @@ window.addEventListener("load", () => {
 
   const justPhotoController = document.querySelector("#just_photo_controll");
   const exchangeController = document.querySelector("#exchange_controll");
-  const minPriceSelectbox = document.querySelector("#min-price-selectbox");
-  const maxPriceSelectbox = document.querySelector("#max-price-selectbox");
+  const minPriceSelectBox = document.querySelector("#min-price-selectbox");
+  const maxPriceSelectBox = document.querySelector("#max-price-selectbox");
 
   const applyFilters = () => {
     let filteredPosts = backupPosts;
 
-    // Handle Dynamic Filters
     for (const slug in appliedFilters) {
       filteredPosts = filteredPosts.filter((post) =>
         post.dynamicFields.some(
-          (field) => field.slug === slug && field.data === appliedFilters[slug],
-        ),
+          (field) => field.slug === slug && field.data === appliedFilters[slug]
+        )
       );
     }
 
-    // Handle Photo Filter
+    console.log("filteredPosts ->", filteredPosts);
+
     if (justPhotoController.checked) {
-      filteredPosts = filteredPosts.filter((post) => post.pics.length !== 0);
+      filteredPosts = filteredPosts.filter((post) => post.pics.length);
     }
 
-    // Handle Exchange Filter
     if (exchangeController.checked) {
       filteredPosts = filteredPosts.filter((post) => post.exchange);
     }
 
-    // Handle Min Max Filtering
-    const minPrice = minPriceSelectbox.value;
-    const maxPrice = maxPriceSelectbox.value;
+    // min / max price filtering
+    const minPrice = minPriceSelectBox.value;
+    const maxPrice = maxPriceSelectBox.value;
     if (maxPrice !== "default") {
       if (minPrice !== "default") {
         filteredPosts = filteredPosts.filter(
-          (post) => post.price >= minPrice && post.price <= maxPrice,
+          (post) => post.price >= minPrice && post.price <= maxPrice
         );
       } else {
         filteredPosts = filteredPosts.filter((post) => post.price <= maxPrice);
@@ -369,20 +374,24 @@ window.addEventListener("load", () => {
         filteredPosts = filteredPosts.filter((post) => post.price >= minPrice);
       }
     }
+
     generatePosts(filteredPosts);
   };
 
-  justPhotoController?.addEventListener("change", () => {
-    applyFilters(posts);
+  minPriceSelectBox?.addEventListener("change", (event) => {
+    applyFilters();
   });
-  exchangeController?.addEventListener("change", () => {
-    applyFilters(posts);
+
+  maxPriceSelectBox?.addEventListener("change", (event) => {
+    applyFilters();
   });
-  minPriceSelectbox?.addEventListener("change", () => {
-    applyFilters(posts);
+
+  justPhotoController.addEventListener("change", (event) => {
+    applyFilters();
   });
-  maxPriceSelectbox?.addEventListener("change", () => {
-    applyFilters(posts);
+
+  exchangeController.addEventListener("change", (event) => {
+    applyFilters();
   });
 
   window.selectBoxFilterHandler = (value, slug) => {
