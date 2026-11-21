@@ -7,11 +7,11 @@ import {
 } from "../../utils/utils.js";
 
 window.addEventListener("load", () => {
-  getPostDetails().then((post) => {
+  getPostDetails().then(async (post) => {
     const loading = document.querySelector("#loading-container");
     loading.style.display = "none";
 
-    const isUserLogin = isLogin();
+    const isUserLogin = await isLogin();
 
     console.log(post);
 
@@ -53,7 +53,7 @@ window.addEventListener("load", () => {
           <i class="main__breadcrumb-icon bi bi-chevron-left"></i>
         </li>
         <li class="main__breadcrumb-item">${post.title}</li>    
-      `
+      `,
     );
 
     shareIcon.addEventListener("click", async () => {
@@ -67,7 +67,7 @@ window.addEventListener("load", () => {
           <span class="post__info-key">قیمت</span>
           <span class="post__info-value">${post.price.toLocaleString()} تومان</span>
         </li>
-      `
+      `,
     );
 
     post.dynamicFields.map((filed) => {
@@ -78,7 +78,7 @@ window.addEventListener("load", () => {
             <span class="post__info-key">${filed.name}</span>
             <span class="post__info-value">${filed.data}</span>
           </li>
-        `
+        `,
       );
     });
 
@@ -87,7 +87,7 @@ window.addEventListener("load", () => {
         `شماره تماس: ${post.creator.phone}`,
         null,
         "تماس گرفتن",
-        () => {}
+        () => {},
       );
     });
 

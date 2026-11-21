@@ -1,3 +1,5 @@
+import { baseUrl } from "./shared.js";
+
 const saveInLocalStorage = (key, value) => {
   localStorage.setItem(key, JSON.stringify(value));
 };
@@ -63,8 +65,21 @@ const showSwal = (title, icon, buttons, callback) => {
   });
 };
 
-const isLogin = () => {
-  return false;
+const getToken = () => {
+  const token = getFromLocalStorage("token");
+  return token;
+};
+
+const isLogin = async () => {
+  const token = getToken();
+  const res = await fetch(`${baseUrl}/v1/auth/me`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  console.log("GetMe Res => ", res);
+
+  return res.status === 200 ? true : false;
 };
 
 export {
