@@ -93,4 +93,5 @@ export {
   hideModal,
   isLogin,
   showSwal,
+  getToken,
 };

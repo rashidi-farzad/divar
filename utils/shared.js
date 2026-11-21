@@ -1,6 +1,7 @@
 import {
   getFromLocalStorage,
   getUrlParam,
+  getToken,
   saveInLocalStorage,
 } from "./utils.js";
 
@@ -84,8 +85,12 @@ const getPostCategories = async () => {
 
 const getPostDetails = async () => {
   const postID = getUrlParam("id");
-
-  const res = await fetch(`${baseUrl}/v1/post/${postID}`);
+  const token = getToken();
+  const res = await fetch(`${baseUrl}/v1/post/${postID}`, {
+    headers: {
+      Authorization: token ? `Bearer ${token}` : null,
+    },
+  });
   const response = await res.json();
   console.log(response);
 

@@ -1,6 +1,7 @@
-import { getPostDetails } from "../../utils/shared.js";
+import { baseUrl, getPostDetails } from "../../utils/shared.js";
 import {
   calcuteRelativeTimeDifference,
+  getToken,
   isLogin,
   showModal,
   showSwal,
@@ -12,6 +13,8 @@ window.addEventListener("load", () => {
     loading.style.display = "none";
 
     const isUserLogin = await isLogin();
+    const token = getToken();
+    let noteID = null;
 
     console.log(post);
 
@@ -99,6 +102,12 @@ window.addEventListener("load", () => {
     });
 
     if (isUserLogin) {
+      if (post.note) {
+        noteTextarea.value = post.note.content;
+        noteTrashIcon.style.display = "block";
+        noteID = post.note._id;
+      }
+
       noteTextarea.addEventListener("keyup", (event) => {
         if (event.target.value.trim()) {
           noteTrashIcon.style.display = "block";
@@ -107,8 +116,31 @@ window.addEventListener("load", () => {
         }
       });
 
-      noteTextarea.addEventListener("blur", (event) => {
-        console.log(event.target.value);
+      noteTextarea.addEventListener("blur", async (event) => {
+        if (noteID) {
+          const res = await fetch(`${baseUrl}/v1/note/${noteID}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              content: event.target.value,
+            }),
+          });
+        } else {
+          const res = await fetch(`${baseUrl}/v1/note`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              postId: post._id,
+              content: event.target.value,
+            }),
+          });
+        }
       });
 
       noteTrashIcon.addEventListener("click", () => {
