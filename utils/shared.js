@@ -32,7 +32,7 @@ const getAndShowSocials = async () => {
         <a href="${social.link}" class="sidebar__icon-link">
             <img width="18px" height="18px" alt="${social.name}" src="${social.icon}" class="sidebar__icon bi bi-twitter" />
         </a>
-      `
+      `,
     );
   });
 };
@@ -87,6 +87,7 @@ const getPostDetails = async () => {
 
   const res = await fetch(`${baseUrl}/v1/post/${postID}`);
   const response = await res.json();
+  console.log(response);
 
   return response.data.post;
 };

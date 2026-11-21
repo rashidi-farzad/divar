@@ -1,3 +1,4 @@
+import { submitNumber, verifyOtp } from "../../utils/auth.js";
 import {
   getAllLocations,
   getAndShowHeaderCityLocation,
@@ -35,6 +36,10 @@ window.addEventListener("load", () => {
   const allCategoriesPosts = document.querySelector("#all-categories-posts");
   const categoriesList = document.querySelector("#categories-list");
   const categoryResults = document.querySelector("#category-results");
+  const submitPhoneNumberBtn = document.querySelector(
+    ".submit_phone_number_btn",
+  );
+  const loginBtn = document.querySelector(".login_btn");
 
   getPostCategories().then((categories) => {
     console.log("Categories ->", categories);
@@ -54,13 +59,13 @@ window.addEventListener("load", () => {
               </div>
             </div>
           </li>
-        `
+        `,
       );
     });
 
     window.showActiveCategorySubs = (categoryID) => {
       const category = categories.find(
-        (category) => category._id === categoryID
+        (category) => category._id === categoryID,
       );
 
       categoryResults.innerHTML = "";
@@ -80,12 +85,12 @@ window.addEventListener("load", () => {
                     <li class="header__category-dropdown-item">
                       <div onclick="categoryClickHandler('${subSubCategory._id}')" class="header__category-dropdown-link">${subSubCategory.title}</div>
                     </li>
-                  `
+                  `,
                   )
                   .join("")}
               </ul>
             </div>
-          `
+          `,
         );
       });
     };
@@ -98,16 +103,19 @@ window.addEventListener("load", () => {
   });
 
   const categoryModalOverlay = document.querySelector(
-    ".category_modal_overlay"
+    ".category_modal_overlay",
   );
 
   const cityModalSearchInput = document.querySelector(
-    "#city-modal-search-input"
+    "#city-modal-search-input",
   );
 
   const searchbarModalOverlay = document.querySelector(
-    ".searchbar__modal-overlay"
+    ".searchbar__modal-overlay",
   );
+
+  const loginModalOverlay = document.querySelector(".login_modal_overlay");
+  const loginModalCloseIcon = document.querySelector(".login-modal__icon");
 
   const mostSearchKeyWords = ["ماشین", "ساعت", "موبایل", "لپ تاپ", "تلویزیون"];
 
@@ -134,7 +142,7 @@ window.addEventListener("load", () => {
         <li class="header__searchbar-dropdown-item">
           <a href="${href}" class="header__searchbar-dropdown-link">${keyword}</a>
         </li>
-      `
+      `,
     );
   });
 
@@ -162,7 +170,7 @@ window.addEventListener("load", () => {
               <i class="city-modal__selected-icon bi bi-x"></i>
             </button>
           </div>
-        `
+        `,
       );
     });
   };
@@ -203,7 +211,7 @@ window.addEventListener("load", () => {
             <span>${province.name}</span>
             <i class="city-modal__cities-icon bi bi-chevron-left"></i>
           </li>
-        `
+        `,
       );
     });
 
@@ -228,16 +236,16 @@ window.addEventListener("load", () => {
               <div id="checkboxShape"></div>
               <input type="checkbox" />
             </li>
-          `
+          `,
         );
 
         const provinceCities = data.cities.filter(
-          (city) => city.province_id === Number(provinceID)
+          (city) => city.province_id === Number(provinceID),
         );
 
         provinceCities.forEach((city) => {
           const isSelect = selectedCities.some(
-            (selectedCity) => selectedCity.title === city.name
+            (selectedCity) => selectedCity.title === city.name,
           );
 
           citiesModalList.insertAdjacentHTML(
@@ -252,12 +260,12 @@ window.addEventListener("load", () => {
                   city.id
                 }')" id="city-item-checkbox" type="checkbox" checked="${isSelect}" />
               </li>
-            `
+            `,
           );
         });
 
         const cityModalAllProvinces = document.querySelector(
-          "#city_modal_all_province"
+          "#city_modal_all_province",
         );
 
         cityModalAllProvinces.addEventListener("click", () => {
@@ -288,7 +296,7 @@ window.addEventListener("load", () => {
       checkboxShape.classList.add("active");
     } else {
       selectedCities = selectedCities.filter(
-        (city) => city.title !== cityTitle
+        (city) => city.title !== cityTitle,
       );
       checkbox.checked = true;
       checkboxShape.classList.remove("active");
@@ -301,7 +309,7 @@ window.addEventListener("load", () => {
     if (cities.length) {
       cityModalAcceptBtn.classList.replace(
         "city-modal__accept",
-        "city-modal__accept--active"
+        "city-modal__accept--active",
       );
 
       deleteAllSelectedCities.style.display = "block";
@@ -309,7 +317,7 @@ window.addEventListener("load", () => {
     } else {
       cityModalAcceptBtn.classList.replace(
         "city-modal__accept--active",
-        "city-modal__accept"
+        "city-modal__accept",
       );
 
       deleteAllSelectedCities.style.display = "none";
@@ -319,7 +327,7 @@ window.addEventListener("load", () => {
 
   const updateSelectedCities = (cityTitle, cityID) => {
     const isTitleRepeated = selectedCities.some(
-      (city) => city.title === cityTitle
+      (city) => city.title === cityTitle,
     );
 
     if (!isTitleRepeated) {
@@ -336,7 +344,7 @@ window.addEventListener("load", () => {
 
     cityModalAcceptBtn.classList.replace(
       "city-modal__accept--active",
-      "city-modal__accept"
+      "city-modal__accept",
     );
 
     cityModalError.style.display = "block";
@@ -358,14 +366,14 @@ window.addEventListener("load", () => {
   globalSearchInput?.addEventListener("click", () => {
     showModal(
       "header__searchbar-dropdown",
-      "header__searchbar-dropdown--active"
+      "header__searchbar-dropdown--active",
     );
   });
 
   searchbarModalOverlay?.addEventListener("click", () => {
     hideModal(
       "header__searchbar-dropdown",
-      "header__searchbar-dropdown--active"
+      "header__searchbar-dropdown--active",
     );
   });
 
@@ -383,7 +391,7 @@ window.addEventListener("load", () => {
 
     cityModalAcceptBtn.classList.replace(
       "city-modal__accept--active",
-      "city-modal__accept"
+      "city-modal__accept",
     );
 
     showProvinces(allCities);
@@ -394,7 +402,7 @@ window.addEventListener("load", () => {
 
     cityModalAcceptBtn.classList.replace(
       "city-modal__accept--active",
-      "city-modal__accept"
+      "city-modal__accept",
     );
 
     showProvinces(allCities);
@@ -403,14 +411,14 @@ window.addEventListener("load", () => {
   cityModalSearchInput?.addEventListener("keyup", (event) => {
     console.log(event.target.value);
     const filteredCities = allCities.cities.filter((city) =>
-      city.name.includes(event.target.value)
+      city.name.includes(event.target.value),
     );
 
     if (event.target.value.trim() && filteredCities.length) {
       citiesModalList.innerHTML = "";
       filteredCities.forEach((city) => {
         const isSelect = selectedCities.some(
-          (selectedCity) => selectedCity.title === city.name
+          (selectedCity) => selectedCity.title === city.name,
         );
 
         citiesModalList.insertAdjacentHTML(
@@ -423,13 +431,23 @@ window.addEventListener("load", () => {
                 city.id
               }')" id="city-item-checkbox" type="checkbox" checked="${isSelect}">
             </li>
-          `
+          `,
         );
       });
     } else {
       citiesModalList.innerHTML = "";
       showProvinces(allCities);
     }
+  });
+
+  submitPhoneNumberBtn.addEventListener("click", (event) => {
+    event.preventDefault();
+    submitNumber();
+  });
+
+  loginBtn.addEventListener("click", (event) => {
+    event.preventDefault();
+    verifyOtp();
   });
 
   headerCategoryBtn?.addEventListener("click", () => {
@@ -442,5 +460,13 @@ window.addEventListener("load", () => {
 
   allCategoriesPosts?.addEventListener("click", () => {
     removeParamFromUrl("categoryID");
+  });
+
+  loginModalOverlay.addEventListener("click", () => {
+    hideModal("login-modal", "login-modal--active");
+  });
+
+  loginModalCloseIcon.addEventListener("click", () => {
+    hideModal("login-modal", "login-modal--active");
   });
 });

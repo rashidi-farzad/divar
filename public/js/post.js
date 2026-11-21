@@ -1,5 +1,10 @@
 import { getPostDetails } from "../../utils/shared.js";
-import { calcuteRelativeTimeDifference, isLogin } from "../../utils/utils.js";
+import {
+  calcuteRelativeTimeDifference,
+  isLogin,
+  showModal,
+  showSwal,
+} from "../../utils/utils.js";
 
 window.addEventListener("load", () => {
   getPostDetails().then((post) => {
@@ -21,6 +26,8 @@ window.addEventListener("load", () => {
     const secendSlider = document.querySelector("#secend-slider-wrapper");
     const noteTextarea = document.querySelector("#note-textarea");
     const postFeedbackIcons = document.querySelectorAll(".post_feedback_icon");
+    const phoneInfoBtn = document.querySelector("#phone-info-btn");
+    const noteTrashIcon = document.querySelector("#note-trash-icon");
 
     postTitle.innerHTML = post.title;
     postDescription.innerHTML = post.description;
@@ -74,5 +81,45 @@ window.addEventListener("load", () => {
         `
       );
     });
+
+    phoneInfoBtn.addEventListener("click", () => {
+      showSwal(
+        `شماره تماس: ${post.creator.phone}`,
+        null,
+        "تماس گرفتن",
+        () => {}
+      );
+    });
+
+    postFeedbackIcons.forEach((icon) => {
+      icon.addEventListener("click", () => {
+        postFeedbackIcons.forEach((icon) => icon.classList.remove("active"));
+        icon.classList.add("active");
+      });
+    });
+
+    if (isUserLogin) {
+      noteTextarea.addEventListener("keyup", (event) => {
+        if (event.target.value.trim()) {
+          noteTrashIcon.style.display = "block";
+        } else {
+          noteTrashIcon.style.display = "none";
+        }
+      });
+
+      noteTextarea.addEventListener("blur", (event) => {
+        console.log(event.target.value);
+      });
+
+      noteTrashIcon.addEventListener("click", () => {
+        noteTextarea.value = "";
+        noteTrashIcon.style.display = "none";
+      });
+    } else {
+      noteTextarea.addEventListener("focus", (event) => {
+        event.preventDefault();
+        showModal("login-modal", "login-modal--active");
+      });
+    }
   });
 });

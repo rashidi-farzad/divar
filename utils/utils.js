@@ -53,8 +53,18 @@ const hideModal = (id, className) => {
   element?.classList.remove(className);
 };
 
+const showSwal = (title, icon, buttons, callback) => {
+  swal({
+    title,
+    icon,
+    buttons,
+  }).then((result) => {
+    callback(result);
+  });
+};
+
 const isLogin = () => {
-  return true;
+  return false;
 };
 
 export {
@@ -67,4 +77,5 @@ export {
   showModal,
   hideModal,
   isLogin,
+  showSwal,
 };
