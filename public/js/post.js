@@ -223,9 +223,13 @@ window.addEventListener("load", () => {
       freeMode: true,
       watchSlidesProgress: true,
     });
-    const secondSliderConfigs = new Swiper(".mySwiper", {
+    const secondSliderConfigs = new Swiper(".mySwiper2", {
       spaceBetween: 10,
       rewind: true,
+      navigation: {
+        nextEl: ".swiper-button-next",
+        prevEl: ".swiper-button-prev",
+      },
       thumbs: {
         swiper: mainSliderConfigs,
       },

@@ -1,4 +1,4 @@
-import { submitNumber, verifyOtp } from "../../utils/auth.js";
+import { submitNumber, verifyOtp, requestNewOTP } from "../../utils/auth.js";
 import {
   getAllLocations,
   getAndShowHeaderCityLocation,
@@ -449,6 +449,11 @@ window.addEventListener("load", () => {
   loginBtn.addEventListener("click", (event) => {
     event.preventDefault();
     verifyOtp();
+  });
+
+  requestNewCodeBtn.addEventListener("click", (event) => {
+    event.preventDefault();
+    requestNewOTP();
   });
 
   headerCategoryBtn?.addEventListener("click", () => {
