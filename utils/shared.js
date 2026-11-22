@@ -209,6 +209,13 @@ const getArticleByCategory = async (id) => {
   return response.data.articles;
 };
 
+const getArticles = async () => {
+  const res = await fetch(`${baseUrl}/v1/support/category-articles`);
+  const response = await res.json();
+
+  return response.data.categories;
+};
+
 export {
   baseUrl,
   getAllCities,
@@ -222,4 +229,5 @@ export {
   getSupportArticles,
   getArticleByID,
   getArticleByCategory,
+  getArticles,
 };
