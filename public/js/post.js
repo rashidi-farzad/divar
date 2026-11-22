@@ -2,6 +2,7 @@ import { baseUrl, getPostDetails } from "../../utils/shared.js";
 import {
   calcuteRelativeTimeDifference,
   getToken,
+  getUrlParam,
   isLogin,
   showModal,
   showSwal,
@@ -15,8 +16,7 @@ window.addEventListener("load", () => {
     const isUserLogin = await isLogin();
     const token = getToken();
     let noteID = null;
-
-    console.log(post);
+    let bookmarkStatus = null;
 
     const postTitle = document.querySelector("#post-title");
     const postDescription = document.querySelector("#post-description");
@@ -31,6 +31,8 @@ window.addEventListener("load", () => {
     const postFeedbackIcons = document.querySelectorAll(".post_feedback_icon");
     const phoneInfoBtn = document.querySelector("#phone-info-btn");
     const noteTrashIcon = document.querySelector("#note-trash-icon");
+    const bookmarkIconBtn = document.querySelector("#bookmark-icon-btn");
+    const bookmarkIcon = bookmarkIconBtn.querySelector(".bi");
 
     postTitle.innerHTML = post.title;
     postDescription.innerHTML = post.description;
@@ -79,7 +81,7 @@ window.addEventListener("load", () => {
         `
           <li class="post__info-item">
             <span class="post__info-key">${filed.name}</span>
-            <span class="post__info-value">${filed.data}</span>
+            <span class="post__info-value">${typeof filed.data === "boolean" ? (filed.data === true ? "دارد" : "ندارد") : filed.data}</span>
           </li>
         `,
       );
@@ -102,6 +104,43 @@ window.addEventListener("load", () => {
     });
 
     if (isUserLogin) {
+      // Bookmark
+      if (post.bookmarked) {
+        bookmarkIcon.style.color = "red";
+        bookmarkStatus = true;
+      } else {
+        bookmarkStatus = false;
+      }
+
+      bookmarkIconBtn.addEventListener("click", async () => {
+        const postID = getUrlParam("id");
+
+        if (bookmarkStatus) {
+          const res = await fetch(`${baseUrl}/v1/bookmark/${postID}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (res.status === 200) {
+            bookmarkStatus = false;
+            bookmarkIcon.style.color = "gray";
+          }
+        } else {
+          const res = await fetch(`${baseUrl}/v1/bookmark/${postID}`, {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (res.status === 201) {
+            bookmarkStatus = true;
+            bookmarkIcon.style.color = "red";
+          }
+        }
+      });
+
+      // Note
       if (post.note) {
         noteTextarea.value = post.note.content;
         noteTrashIcon.style.display = "block";
