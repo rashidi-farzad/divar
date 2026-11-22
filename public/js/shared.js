@@ -4,6 +4,7 @@ import {
   getAndShowHeaderCityLocation,
   getAndShowSocials,
   getPostCategories,
+  showPanelLinks,
 } from "../../utils/shared.js";
 import {
   addParamToUrl,
@@ -17,6 +18,7 @@ import {
 
 window.addEventListener("load", () => {
   getAndShowSocials();
+  showPanelLinks();
   getAndShowHeaderCityLocation();
 
   let selectedCities = [];
