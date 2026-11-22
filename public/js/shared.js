@@ -39,6 +39,7 @@ window.addEventListener("load", () => {
   const submitPhoneNumberBtn = document.querySelector(
     ".submit_phone_number_btn",
   );
+  const requestNewCodeBtn = document.querySelector(".req_new_code_btn");
   const loginBtn = document.querySelector(".login_btn");
 
   getPostCategories().then((categories) => {
