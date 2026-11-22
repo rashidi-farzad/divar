@@ -191,6 +191,12 @@ const showPanelLinks = async () => {
   }
 };
 
+const getSupportArticles = async () => {
+  const res = await fetch(`${baseUrl}/v1/support/category-articles`);
+  const response = await res.json();
+  return response.data.categories;
+};
+
 export {
   baseUrl,
   getAllCities,
@@ -201,4 +207,5 @@ export {
   getAndShowHeaderCityLocation,
   getPostDetails,
   showPanelLinks,
+  getSupportArticles,
 };

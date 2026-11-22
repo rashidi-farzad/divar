@@ -48,7 +48,7 @@ window.addEventListener("load", () => {
     console.log("Categories ->", categories);
 
     categories.forEach((category) => {
-      categoriesList.insertAdjacentHTML(
+      categoriesList?.insertAdjacentHTML(
         "beforeend",
         `
           <li class="header__category-menu-item" onmouseenter="showActiveCategorySubs('${category._id}')">
@@ -71,10 +71,10 @@ window.addEventListener("load", () => {
         (category) => category._id === categoryID,
       );
 
-      categoryResults.innerHTML = "";
+      categoryResults ? (categoryResults.innerHTML = "") : null;
 
       category.subCategories.map((subCategory) => {
-        categoryResults.insertAdjacentHTML(
+        categoryResults?.insertAdjacentHTML(
           "beforeend",
           `
             <div>
@@ -139,7 +139,7 @@ window.addEventListener("load", () => {
       categoryID ? `&categoryID=${categoryID}` : ""
     }`;
 
-    mostSearchedContainer.insertAdjacentHTML(
+    mostSearchedContainer?.insertAdjacentHTML(
       "beforeend",
       `
         <li class="header__searchbar-dropdown-item">
@@ -200,11 +200,11 @@ window.addEventListener("load", () => {
   });
 
   const showProvinces = (data) => {
-    citiesModalList.innerHTML = "";
-    cityModalCities.scrollTo(0, 0);
+    citiesModalList ? (citiesModalList.innerHTML = "") : null;
+    cityModalCities?.scrollTo(0, 0);
 
     data.provinces.forEach((province) => {
-      citiesModalList.insertAdjacentHTML(
+      citiesModalList?.insertAdjacentHTML(
         "beforeend",
         `
           <li
