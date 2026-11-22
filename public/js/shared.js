@@ -45,8 +45,6 @@ window.addEventListener("load", () => {
   const loginBtn = document.querySelector(".login_btn");
 
   getPostCategories().then((categories) => {
-    console.log("Categories ->", categories);
-
     categories.forEach((category) => {
       categoriesList?.insertAdjacentHTML(
         "beforeend",
@@ -443,17 +441,17 @@ window.addEventListener("load", () => {
     }
   });
 
-  submitPhoneNumberBtn.addEventListener("click", (event) => {
+  submitPhoneNumberBtn?.addEventListener("click", (event) => {
     event.preventDefault();
     submitNumber();
   });
 
-  loginBtn.addEventListener("click", (event) => {
+  loginBtn?.addEventListener("click", (event) => {
     event.preventDefault();
     verifyOtp();
   });
 
-  requestNewCodeBtn.addEventListener("click", (event) => {
+  requestNewCodeBtn?.addEventListener("click", (event) => {
     event.preventDefault();
     requestNewOTP();
   });
@@ -470,11 +468,11 @@ window.addEventListener("load", () => {
     removeParamFromUrl("categoryID");
   });
 
-  loginModalOverlay.addEventListener("click", () => {
+  loginModalOverlay?.addEventListener("click", () => {
     hideModal("login-modal", "login-modal--active");
   });
 
-  loginModalCloseIcon.addEventListener("click", () => {
+  loginModalCloseIcon?.addEventListener("click", () => {
     hideModal("login-modal", "login-modal--active");
   });
 });

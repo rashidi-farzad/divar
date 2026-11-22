@@ -5,7 +5,6 @@ window.addEventListener("load", () => {
   loading.style.display = "none";
   getSupportArticles().then((supportArticlesCategory) => {
     loading.style.display = "none";
-    console.log("support", supportArticlesCategory);
     const popularArticlesElement = document.querySelector("#popular-articles");
     const categoriesContainerElement = document.querySelector(
       "#categories-container",

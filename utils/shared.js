@@ -30,7 +30,7 @@ const getAndShowSocials = async () => {
   const socialsResponse = await res.json();
 
   socialsResponse.data.socials.forEach((social) => {
-    socialMediaContainer.insertAdjacentHTML(
+    socialMediaContainer?.insertAdjacentHTML(
       "beforeend",
       `
         <a href="${social.link}" class="sidebar__icon-link">
@@ -197,6 +197,18 @@ const getSupportArticles = async () => {
   return response.data.categories;
 };
 
+const getArticleByID = async (id) => {
+  const res = await fetch(`${baseUrl}/v1/support/articles/${id}`);
+  const response = await res.json();
+  return response.data.article;
+};
+
+const getArticleByCategory = async (id) => {
+  const res = await fetch(`${baseUrl}/v1/support/categories/${id}/articles`);
+  const response = await res.json();
+  return response.data.articles;
+};
+
 export {
   baseUrl,
   getAllCities,
@@ -208,4 +220,6 @@ export {
   getPostDetails,
   showPanelLinks,
   getSupportArticles,
+  getArticleByID,
+  getArticleByCategory,
 };

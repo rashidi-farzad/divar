@@ -100,6 +100,7 @@ const getMe = async () => {
   const response = await res.json();
   return response.data.user;
 };
+
 export {
   saveInLocalStorage,
   getFromLocalStorage,
