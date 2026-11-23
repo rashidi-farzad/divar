@@ -56,6 +56,9 @@ window.addEventListener("load", () => {
 
     searchInput.addEventListener("keyup", (event) => {
       if (event.target.value.trim()) {
+        if (event.key === "Enter") {
+          location.href = `/pages/support/search.html?key=${event.target.value.trim()}`;
+        }
         searchResult.classList.add("active");
         removeIcon.classList.add("active");
 
@@ -64,7 +67,7 @@ window.addEventListener("load", () => {
         );
         if (filteredArticles.length) {
           searchResult.innerHTML = `
-          <a>
+          <a href="/pages/support/search.html?key=${event.target.value.trim()}">
             <i class="bi bi-search"></i>
             ${event.target.value.trim()}
           </a>
@@ -82,7 +85,7 @@ window.addEventListener("load", () => {
           });
         } else {
           searchResult.innerHTML = `
-          <a>
+          <a href="/pages/support/search.html?key=${event.target.value.trim()}">
             <i class="bi bi-search"></i>
             ${event.target.value.trim()}
           </a>
