@@ -14,17 +14,17 @@ window.addEventListener("load", () => {
 
     console.log("category", category);
 
-    breadcrumbSpan.innerHTML = category.name;
-    document.title = category.name;
+    breadcrumbSpan.innerHTML = category?.name;
+    document.title = category?.name;
 
     categoryInfo.insertAdjacentHTML(
       "beforeend",
       `
-        <img class="category-info-icon" src="${baseUrl}/${category.pic.path}" />
-        <p class="category-info-title">${category.name}</p>
+        <img class="category-info-icon" src="${baseUrl}/${category?.pic.path}" />
+        <p class="category-info-title">${category?.name}</p>
         `,
     );
-    category.articles.map((article) => {
+    category?.articles.map((article) => {
       articlesContainer.insertAdjacentHTML(
         "beforeend",
         `

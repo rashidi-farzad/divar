@@ -43,5 +43,62 @@ window.addEventListener("load", () => {
             `,
       );
     });
+
+    const articles = [];
+    supportArticlesCategory.map((category) => {
+      let categoryArticles = category.articles;
+      articles.push(...categoryArticles);
+    });
+    console.log("articles => ", articles);
+    const searchInput = document.querySelector("#search-input");
+    const removeIcon = document.querySelector("#remove-icon");
+    const searchResult = document.querySelector("#search-result");
+
+    searchInput.addEventListener("keyup", (event) => {
+      if (event.target.value.trim()) {
+        searchResult.classList.add("active");
+        removeIcon.classList.add("active");
+
+        const filteredArticles = articles.filter((article) =>
+          article.title.includes(event.target.value.trim()),
+        );
+        if (filteredArticles.length) {
+          searchResult.innerHTML = `
+          <a>
+            <i class="bi bi-search"></i>
+            ${event.target.value.trim()}
+          </a>
+          `;
+          filteredArticles.map((article) => {
+            searchResult.insertAdjacentHTML(
+              "beforeend",
+              `
+          <a href="/pages/support/article.html?id=${article._id}">
+            <i class="bi bi-card-text"></i>
+            ${article.title}
+          </a>
+          `,
+            );
+          });
+        } else {
+          searchResult.innerHTML = `
+          <a>
+            <i class="bi bi-search"></i>
+            ${event.target.value.trim()}
+          </a>
+          `;
+        }
+      } else {
+        searchInput.value = "";
+        searchResult.classList.remove("active");
+        removeIcon.classList.remove("active");
+      }
+    });
+
+    removeIcon.addEventListener("click", () => {
+      searchInput.value = "";
+      searchResult.classList.remove("active");
+      removeIcon.classList.remove("active");
+    });
   });
 });
