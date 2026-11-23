@@ -11,18 +11,20 @@ import {
   getFromLocalStorage,
   getUrlParam,
   hideModal,
+  isLogin,
   removeParamFromUrl,
   saveInLocalStorage,
   showModal,
 } from "../../utils/utils.js";
 
-window.addEventListener("load", () => {
+window.addEventListener("load", async () => {
   getAndShowSocials();
   showPanelLinks();
   getAndShowHeaderCityLocation();
 
   let selectedCities = [];
   let allCities = [];
+  const isUserLogin = await isLogin();
 
   const globalSearchInput = document.querySelector("#global_search_input");
   const mostSearchedContainer = document.querySelector("#most_searched");
@@ -43,6 +45,7 @@ window.addEventListener("load", () => {
   );
   const requestNewCodeBtn = document.querySelector(".req_new_code_btn");
   const loginBtn = document.querySelector(".login_btn");
+  const createPostBtn = document.querySelector(".create_post_btn");
 
   getPostCategories().then((categories) => {
     categories.forEach((category) => {
@@ -474,5 +477,14 @@ window.addEventListener("load", () => {
 
   loginModalCloseIcon?.addEventListener("click", () => {
     hideModal("login-modal", "login-modal--active");
+  });
+
+  createPostBtn?.addEventListener("click", () => {
+    if (isUserLogin) {
+      location.href = "/pages/new.html";
+    } else {
+      showModal("login-modal", "login-modal--active");
+      hideModal("header__category-menu", "header__category-menu--active");
+    }
   });
 });
