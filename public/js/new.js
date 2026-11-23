@@ -32,7 +32,9 @@ window.addEventListener("load", async () => {
       categoriesSection.insertAdjacentHTML(
         "beforeend",
         `
-          <div class="back">
+          <div style="display: flex; align-items: center; gap: 8px; cursor: pointer" class="back" onclick="${
+            id ? `categoryClickHandler('${id}')` : `backToAllCategories()`
+          }">
             <i class="bi bi-arrow-right"></i>
             <p>بازگشت به ${title}</p>
           </div>
@@ -69,7 +71,7 @@ window.addEventListener("load", async () => {
     const category = categories.find((category) => category._id === categoryID);
 
     if (category) {
-      generateCategoriesTemplate(category.subCategories, "همه دسته‌ها");
+      generateCategoriesTemplate(category.subCategories, "همه دسته‌ها", null);
     } else {
       const allSubCategories = categories.flatMap(
         (category) => category.subCategories,
@@ -80,15 +82,23 @@ window.addEventListener("load", async () => {
       );
 
       if (subCategory) {
+        const subCategoryParent = categories.find(
+          (category) => category._id === subCategory.parent,
+        );
+
         generateCategoriesTemplate(
           subCategory.subCategories,
-          subCategory.title,
-          subCategory._id,
+          subCategoryParent.title,
+          subCategoryParent._id,
         );
       } else {
         location.href = `/pages/new/registerPost.html?subCategoryID=${categoryID}`;
       }
     }
+  };
+
+  window.backToAllCategories = () => {
+    generateCategoriesTemplate(categories);
   };
 
   generateCategoriesTemplate(categories);
