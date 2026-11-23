@@ -7,6 +7,9 @@ window.addEventListener("load", async () => {
   const categoriesContainer = document.querySelector("#categories-container");
   const categoriesSection = document.querySelector("#categories");
   const descriptionCheckbox = document.querySelector("#description-checkbox");
+  const searchInput = document.querySelector("#search-input");
+  const resultContainerModal = document.querySelector("#result-container");
+  const removeIcon = document.querySelector("#remove-icon");
 
   const isUserLogin = await isLogin();
 
@@ -105,5 +108,57 @@ window.addEventListener("load", async () => {
 
   descriptionCheckbox.addEventListener("change", () => {
     generateCategoriesTemplate(categories);
+  });
+
+  const subCategoriesResult = await fetch(`${baseUrl}/v1/category/sub`);
+  const subCategoriesResponse = await subCategoriesResult.json();
+  const subCategories = subCategoriesResponse.data.categories;
+  console.log(subCategories);
+
+  searchInput.addEventListener("keyup", (event) => {
+    if (event.target.value.trim()) {
+      const filteredCategories = subCategories.filter((subCategory) =>
+        subCategory.title.includes(event.target.value.trim()),
+      );
+      resultContainerModal.classList.add("active");
+      removeIcon.classList.add("active");
+      resultContainerModal.innerHTML = "";
+
+      if (filteredCategories.length) {
+        filteredCategories.map((category) => {
+          resultContainerModal.insertAdjacentHTML(
+            "beforeend",
+            `
+              <a href="/pages/new/registerPost.html?subCategoryID=${category._id}" class="search-result">
+                <p>${category.title}</p>
+                <i class="bi bi-chevron-left"></i>
+              </a>
+            `,
+          );
+        });
+      } else {
+        resultContainerModal.insertAdjacentHTML(
+          "beforeend",
+          `
+          <div class="empty">
+            <img src="https://support-faq.divarcdn.com/web/2024/03/static/media/magnifier.7f88b2e3f8ae30f4333986d0b0fbcf1d.svg" />
+            <p>نتیجه ای برای جستجوی شما یافت نشد</p>
+          </div>
+          `,
+        );
+      }
+    } else {
+      searchInput.value = "";
+      resultContainerModal.innerHTML = "";
+      resultContainerModal.classList.remove("active");
+      removeIcon.classList.remove("active");
+    }
+  });
+
+  removeIcon.addEventListener("click", () => {
+    searchInput.value = "";
+    resultContainerModal.innerHTML = "";
+    resultContainerModal.classList.remove("active");
+    removeIcon.classList.remove("active");
   });
 });
