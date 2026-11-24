@@ -1,9 +1,8 @@
 import { baseUrl, getAllLocations } from "../../../utils/shared.js";
-import { getToken, getUrlParam, showSwal } from "../../../utils/utils.js";
+import { getToken, getUrlParam, showSwal } from "./../../../utils/utils.js";
 
 window.addEventListener("load", async () => {
   const subCategoryID = getUrlParam("subCategoryID");
-
   const categoryTitle = document.querySelector("#subCategory-title");
   const loading = document.querySelector("#loading-container");
   const dynamicFields = document.querySelector("#dynamic-fields");
@@ -12,12 +11,16 @@ window.addEventListener("load", async () => {
   const registerBtn = document.querySelector("#register-btn");
   const citySelectBox = document.querySelector("#city-select");
   const neighborhoodSelectBox = document.querySelector("#neighborhood-select");
+  const postTitleInput = document.querySelector("#post-title-input");
+  const postPriceInput = document.querySelector("#post-price-input");
+  const exchangeCheckbox = document.querySelector("#exchange-checkbox");
+  const postDescriptionTextarea = document.querySelector(
+    "#post-description-textarea",
+  );
 
   const res = await fetch(`${baseUrl}/v1/category/sub`);
   const response = await res.json();
   const categories = response.data.categories;
-
-  loading.style.display = "none";
 
   let mapView = { x: 35.715298, y: 51.404343 };
   let markerIcon = null;
@@ -80,7 +83,7 @@ window.addEventListener("load", async () => {
     (category) => category._id === subCategoryID,
   );
 
-  categoryTitle.textContent = subCategory.title;
+  categoryTitle.innerHTML = subCategory.title;
 
   subCategory.productFields.map((field) => {
     dynamicFields.insertAdjacentHTML(
@@ -124,10 +127,7 @@ window.addEventListener("load", async () => {
   });
 
   window.fieldChangeHandler = (slug, data) => {
-    console.log({ slug, data });
     categoryFields[slug] = data;
-
-    console.log("categoryFields ->", categoryFields);
   };
 
   subCategory.productFields.forEach((field) => {
@@ -141,19 +141,18 @@ window.addEventListener("load", async () => {
   uploader.addEventListener("change", (event) => {
     if (event.target.files.length) {
       let file = event.target.files[0];
-
+      console.log(file);
+      // Validation for type and size + pics.length (You)
       if (
-        file.type === "image/webp" ||
         file.type === "image/jpeg" ||
         file.type === "image/png" ||
         file.type === "image/jpg"
       ) {
         pics.push(file);
         generateImage(pics);
-        console.log(pics);
       } else {
         showSwal(
-          "فرمت فایل آپلود شده مجاز نیست",
+          "فرمت فایل آپلودی مجاز نیست ",
           "error",
           "تلاش مجدد",
           () => null,
@@ -163,6 +162,7 @@ window.addEventListener("load", async () => {
   });
 
   const generateImage = async (pics) => {
+    console.log("Pics ->", pics);
     imagesContainer.innerHTML = "";
     pics.map((pic) => {
       let reader = new FileReader();
@@ -175,8 +175,8 @@ window.addEventListener("load", async () => {
               <div onclick="deleteImage('${pic.name}')">
                 <i class="bi bi-trash"></i>
               </div>
-                <img src="${src}" alt="post-image" />
-            </div>
+              <img src="${src}" alt="post-image" />
+            </div>        
           `,
         );
       };
@@ -281,22 +281,61 @@ window.addEventListener("load", async () => {
   });
 
   registerBtn.addEventListener("click", async () => {
-    // 2 Validation (Dynamic - Static)
+    // Dunamic Fields Validation
 
-    const formData = new FormData();
-    // formData.append()
-    // pics array
+    let allFieldsFilled = true;
 
-    const res = await fetch(`${baseUrl}/v1/post/${subCategoryID}`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    });
+    for (const key in categoryFields) {
+      if (categoryFields[key] === null) {
+        allFieldsFilled = false;
+      }
+    }
 
-    if (res.status === 200) {
-      // Codes
+    // Static Fields Validation
+    if (
+      !allFieldsFilled ||
+      neighborhoodSelectBox.value === "default" ||
+      !postTitleInput.value.trim().length ||
+      !postDescriptionTextarea.value.trim().length ||
+      !postPriceInput.value.trim().length
+    ) {
+      showSwal("لطفا همه مشخصات رو مشخص کنید", "error", "تلاش مجدد", () => {});
+    } else {
+      const formData = new FormData();
+      formData.append("city", citySelectBox.value);
+      formData.append("neighborhood", neighborhoodSelectBox.value);
+      formData.append("title", postTitleInput.value);
+      formData.append("description", postDescriptionTextarea.value);
+      formData.append("price", postPriceInput.value);
+      formData.append("exchange", exchangeCheckbox.checked);
+      formData.append("map", JSON.stringify(mapView));
+      formData.append("categoryFields", JSON.stringify(categoryFields));
+
+      pics.map((pic) => {
+        formData.append("pics", pic);
+      });
+
+      const res = await fetch(`${baseUrl}/v1/post/${subCategoryID}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const data = await res.json();
+      console.log("Response Data ->", data);
+
+      if (res.status === 201) {
+        showSwal(
+          "آگهی مورد نظر با موفقیت در صف انتشار قرار گرفت",
+          "success",
+          "اوکی",
+          () => {
+            location.href = `/pages/userPanel/posts/preview.html`;
+          },
+        );
+      }
     }
   });
 });
