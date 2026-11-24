@@ -1,15 +1,15 @@
-import { baseUrl } from "../../../utils/shared.js";
+import { baseUrl, getAllLocations } from "../../../utils/shared.js";
 import { getUrlParam } from "../../../utils/utils.js";
 
 window.addEventListener("load", async () => {
   const subCategoryID = getUrlParam("subCategoryID");
 
-  const categoryTitle = document.querySelector(".category_details p");
+  const categoryTitle = document.querySelector("#subCategory-title");
   const loading = document.querySelector("#loading-container");
   const dynamicFields = document.querySelector("#dynamic-fields");
   const registerBtn = document.querySelector("#register-btn");
-  const citySelect = document.querySelector("#city-select");
-  const neighborhoodSelect = document.querySelector("#neighborhood-select");
+  const citySelectBox = document.querySelector("#city-select");
+  const neighborhoodSelectBox = document.querySelector("#neighborhood-select");
 
   const res = await fetch(`${baseUrl}/v1/category/sub`);
   const response = await res.json();
@@ -81,7 +81,96 @@ window.addEventListener("load", async () => {
     }
   });
 
-  console.log("Default categoryFields ->", categoryFields);
+  getAllLocations().then((data) => {
+    loading.style.display = "none";
+
+    const cityChoices = new Choices(citySelectBox);
+    const neighborhoodChoices = new Choices(neighborhoodSelectBox);
+
+    const tehranNeighborhood = data.neighborhoods.filter(
+      (neighborhood) => neighborhood.city_id === 301, // 301 is tehran code
+    );
+
+    const neighborhoodChoicesConfigs = [
+      {
+        value: "default",
+        label: "انتخاب محله",
+        disabled: true,
+        selected: true,
+      },
+      ...tehranNeighborhood.map((neighborhood) => ({
+        value: neighborhood.id,
+        label: neighborhood.name,
+      })),
+    ];
+
+    neighborhoodChoices.setChoices(
+      neighborhoodChoicesConfigs,
+      "value",
+      "label",
+      false,
+    );
+
+    cityChoices.setChoices(
+      data.cities.map((city) => {
+        return {
+          value: city.id,
+          label: city.name,
+          customProperties: { id: city.id },
+          selected: city.name === "تهران" ? true : false,
+        };
+      }),
+      "value",
+      "label",
+      false,
+    );
+
+    citySelectBox.addEventListener("addItem", (event) => {
+      neighborhoodChoices.clearStore();
+      const neighborhoods = data.neighborhoods.filter(
+        (neighborhood) =>
+          neighborhood.city_id === event.detail.customProperties.id,
+      );
+
+      console.log(neighborhoods);
+
+      if (neighborhoods.length) {
+        const neighborhoodChoicesConfigs = [
+          {
+            value: "default",
+            label: "انتخاب محله",
+            disabled: true,
+            selected: true,
+          },
+          ...neighborhoods.map((neighborhood) => ({
+            value: neighborhood.id,
+            label: neighborhood.name,
+          })),
+        ];
+
+        neighborhoodChoices.setChoices(
+          neighborhoodChoicesConfigs,
+          "value",
+          "label",
+          false,
+        );
+      } else {
+        neighborhoodChoices.setChoices(
+          [
+            {
+              value: 0,
+              label: "محله‌ای یافت نشد",
+              disabled: true,
+              selected: true,
+            },
+          ],
+          "value",
+          "label",
+          false,
+        );
+      }
+    });
+  });
 
   registerBtn.addEventListener("click", async () => {
     // 2 Validation (Dynamic - Static)
