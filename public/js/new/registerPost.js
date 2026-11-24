@@ -1,5 +1,5 @@
 import { baseUrl, getAllLocations } from "../../../utils/shared.js";
-import { getUrlParam } from "../../../utils/utils.js";
+import { getToken, getUrlParam, showSwal } from "../../../utils/utils.js";
 
 window.addEventListener("load", async () => {
   const subCategoryID = getUrlParam("subCategoryID");
@@ -7,6 +7,8 @@ window.addEventListener("load", async () => {
   const categoryTitle = document.querySelector("#subCategory-title");
   const loading = document.querySelector("#loading-container");
   const dynamicFields = document.querySelector("#dynamic-fields");
+  const uploader = document.querySelector("#uploader");
+  const imagesContainer = document.querySelector("#images-container");
   const registerBtn = document.querySelector("#register-btn");
   const citySelectBox = document.querySelector("#city-select");
   const neighborhoodSelectBox = document.querySelector("#neighborhood-select");
@@ -17,7 +19,9 @@ window.addEventListener("load", async () => {
 
   loading.style.display = "none";
 
+  let pics = [];
   const categoryFields = {};
+  const token = getToken();
 
   const subCategory = categories.find(
     (category) => category._id === subCategoryID,
@@ -80,6 +84,58 @@ window.addEventListener("load", async () => {
       categoryFields[field.slug] = null;
     }
   });
+
+  uploader.addEventListener("change", (event) => {
+    if (event.target.files.length) {
+      let file = event.target.files[0];
+      console.log(file);
+
+      if (
+        file.type === "image/webp" ||
+        file.type === "image/jpeg" ||
+        file.type === "image/png" ||
+        file.type === "image/jpg"
+      ) {
+        pics.push(file);
+        generateImage(pics);
+        console.log(pics);
+      } else {
+        showSwal(
+          "فرمت فایل آپلود شده مجاز نیست",
+          "error",
+          "تلاش مجدد",
+          () => null,
+        );
+      }
+    }
+  });
+
+  const generateImage = async (pics) => {
+    imagesContainer.innerHTML = "";
+    pics.map((pic) => {
+      let reader = new FileReader();
+      reader.onloadend = function () {
+        let src = reader.result;
+        imagesContainer.insertAdjacentHTML(
+          "beforeend",
+          `
+            <div class="image-box">
+              <div onclick="deleteImage('${pic.name}')">
+                <i class="bi bi-trash"></i>
+              </div>
+                <img src="${src}" alt="post-image" />
+            </div>
+          `,
+        );
+      };
+      reader.readAsDataURL(pic);
+    });
+  };
+
+  window.deleteImage = (picName) => {
+    pics = pics.filter((pic) => pic.name !== picName);
+    generateImage(pics);
+  };
 
   getAllLocations().then((data) => {
     loading.style.display = "none";
