@@ -129,4 +129,20 @@ const requestNewOTP = async () => {
   }
 };
 
-export { submitNumber, verifyOtp, requestNewOTP };
+const logout = async () => {
+  showSwal(
+    "آیا از خروج اطمینان دارید؟",
+    "warning",
+    ["خیر", "بله"],
+    (result) => {
+      if (result) {
+        localStorage.removeItem("token");
+        showSwal("با موفقیت خارج شدید", "success", "تایید", () => {
+          location.href = "/index.html";
+        });
+      }
+    },
+  );
+};
+
+export { submitNumber, verifyOtp, requestNewOTP, logout };

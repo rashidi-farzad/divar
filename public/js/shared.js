@@ -1,4 +1,9 @@
-import { submitNumber, verifyOtp, requestNewOTP } from "../../utils/auth.js";
+import {
+  submitNumber,
+  verifyOtp,
+  requestNewOTP,
+  logout,
+} from "../../utils/auth.js";
 import {
   getAllLocations,
   getAndShowHeaderCityLocation,
@@ -9,6 +14,7 @@ import {
 import {
   addParamToUrl,
   getFromLocalStorage,
+  getMe,
   getUrlParam,
   hideModal,
   isLogin,
@@ -46,6 +52,13 @@ window.addEventListener("load", async () => {
   const requestNewCodeBtn = document.querySelector(".req_new_code_btn");
   const loginBtn = document.querySelector(".login_btn");
   const createPostBtn = document.querySelector(".create_post_btn");
+
+  getMe().then((user) => {
+    if (user) {
+      const logoutBtn = document.querySelector(".logout-link");
+      logoutBtn?.addEventListener("click", logout);
+    }
+  });
 
   getPostCategories().then((categories) => {
     categories.forEach((category) => {

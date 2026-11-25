@@ -2,7 +2,9 @@ import { baseUrl } from "../../../utils/shared.js";
 import {
   calcuteRelativeTimeDifference,
   getToken,
+  getUrlParam,
   showSwal,
+  paginateItems,
 } from "../../../utils/utils.js";
 
 window.addEventListener("load", async () => {
@@ -10,13 +12,32 @@ window.addEventListener("load", async () => {
   let posts = [];
 
   const postsContainer = document.querySelector("#posts-container");
+  const loading = document.querySelector("#loading-container");
+  const paginationItems = document.querySelector(".pagination-items");
   const emptyContainer = document.querySelector(".empty");
 
-  window.postGenerator = (post) => {
-    const date = calcuteRelativeTimeDifference(post.createdAt);
-    postsContainer.insertAdjacentHTML(
-      "beforeend",
-      `
+  let page = getUrlParam("page");
+  !page ? (page = 1) : null;
+
+  const postGenerator = async () => {
+    const res = await fetch(
+      `${baseUrl}/v1/user/bookmarks?page=${page}&limit=4`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    const response = await res.json();
+    posts = response.data.posts;
+
+    if (posts.length) {
+      posts.map((post) => {
+        const date = calcuteRelativeTimeDifference(post.createdAt);
+        postsContainer.insertAdjacentHTML(
+          "beforeend",
+          `
         <div class="post">
             <div>
                 <div>
@@ -47,56 +68,59 @@ window.addEventListener("load", async () => {
             </div>
         </div>    
       `,
-    );
+        );
+      });
+
+      console.log(response.data);
+
+      paginateItems(
+        "/pages/userPanel/bookmarks.html",
+        paginationItems,
+        page,
+        response.data.pagination.totalPosts,
+        4,
+      );
+      loading.style.display = "none";
+    } else {
+      emptyContainer.style.display = "flex";
+    }
   };
 
-  const res = await fetch(`${baseUrl}/v1/user/bookmarks`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  const response = await res.json();
-  posts = response.data.posts;
-
-  if (posts.length) {
-    posts.map((post) => {
-      postGenerator(post);
-    });
-  } else {
-    emptyContainer.style.display = "flex";
-  }
+  postGenerator();
 
   window.removeBookmark = async (postID) => {
     showSwal(
-      "آیا از حذف این نشان مطمین هستید؟",
+      "آیا از حذف این نشان مطمئن هستید؟",
       "warning",
       ["خیر", "بله"],
-      async (result) => {
+      (result) => {
         if (result) {
-          const res = await fetch(`${baseUrl}/v1/bookmark/${postID}`, {
+          fetch(`${baseUrl}/v1/bookmark/${postID}`, {
             method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+            headers: { Authorization: `Bearer ${token}` },
+          }).then((res) => {
+            if (res.status === 200) {
+              posts = posts.filter((post) => post._id !== postID);
 
-          if (res.status === 200) {
-            posts = posts.filter((post) => post._id !== postID);
-            postsContainer.innerHTML = "";
-            if (posts.length) {
-              posts.map((post) => {
-                postGenerator(post);
-              });
-            } else {
-              emptyContainer.style.display = "flex";
+              postsContainer.innerHTML = "";
+              if (posts.length) {
+                posts.map((post) => {
+                  postGenerator(post);
+                });
+              } else {
+                emptyContainer.style.display = "flex";
+              }
             }
-          }
+          });
         }
       },
     );
   };
 
   window.sharePost = async (postID, postTitle) => {
-    navigator.share({ title: postTitle, url: `/pages/post.html?id=${postID}` });
+    await navigator.share({
+      title: postTitle,
+      url: `/pages/post.html?id=${postID}`,
+    });
   };
 });
