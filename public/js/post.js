@@ -1,6 +1,8 @@
 import { baseUrl, getPostDetails } from "../../utils/shared.js";
 import {
   calcuteRelativeTimeDifference,
+  getFromLocalStorage,
+  saveInLocalStorage,
   getToken,
   getUrlParam,
   isLogin,
@@ -17,6 +19,21 @@ window.addEventListener("load", () => {
     const token = getToken();
     let noteID = null;
     let bookmarkStatus = null;
+
+    const recentSeens = getFromLocalStorage("recent-seens");
+    const isPostSeen = recentSeens?.some((postID) => postID === post._id);
+
+    if (!isPostSeen && recentSeens) {
+      saveInLocalStorage("recent-seens", [...recentSeens, post._id]);
+    } else {
+      if (recentSeens) {
+        if (!isPostSeen) {
+          saveInLocalStorage("recent-seens", [...recentSeens, post._id]);
+        }
+      } else {
+        saveInLocalStorage("recent-seens", [post._id]);
+      }
+    }
 
     const postTitle = document.querySelector("#post-title");
     const postDescription = document.querySelector("#post-description");
