@@ -1,5 +1,10 @@
 import { baseUrl } from "../../../utils/shared.js";
-import { getToken, getUrlParam, showSwal } from "./../../../utils/utils.js";
+import {
+  getToken,
+  getUrlParam,
+  paginateItems,
+  showSwal,
+} from "./../../../utils/utils.js";
 
 window.addEventListener("load", async () => {
   const token = getToken();
@@ -13,7 +18,7 @@ window.addEventListener("load", async () => {
     const paginationItems = document.querySelector(".pagination-items");
     const emptyContainer = document.querySelector(".empty");
 
-    const res = await fetch(`${baseUrl}/v1/post/all`, {
+    const res = await fetch(`${baseUrl}/v1/post/all?page=${page}&limit=4`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -89,6 +94,15 @@ window.addEventListener("load", async () => {
     } else {
       emptyContainer.style.display = "flex";
     }
+
+    console.log(response);
+    paginateItems(
+      "/pages/adminPanel/posts.html",
+      paginationItems,
+      page,
+      response.data.pagination.totalPosts,
+      4,
+    );
   };
 
   await postsGenerator();
