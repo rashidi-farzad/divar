@@ -35,7 +35,22 @@ const calcuteRelativeTimeDifference = (createdAt) => {
   const createdTime = new Date(createdAt);
 
   const timeDifference = currentTime - createdTime;
-  const hours = Math.floor(timeDifference / (60 * 60 * 1000));
+  const seconds = Math.floor(timeDifference / 1000);
+
+  if (seconds < 60) {
+    return `لحظاتی پیش`;
+  } else if (seconds < 3600) {
+    const minutes = Math.floor(seconds / 60);
+    return `${minutes} دقیقه پیش`;
+  } else {
+    const hours = Math.floor(seconds / 3600);
+    if (hours < 24) {
+      return `${hours} ساعت پیش`;
+    } else {
+      const days = Math.floor(hours / 24);
+      return `${days} روز پیش`;
+    }
+  }
 
   if (hours < 24) {
     return `${hours} ساعت پیش`;
