@@ -94,7 +94,31 @@ window.addEventListener("load", async () => {
   await postsGenerator();
 
   window.deletePost = (postID) => {
-    console.log(postID);
+    showSwal(
+      "آیا از حذف آگهی مطمئن هستید؟",
+      "warning",
+      ["خیر", "آره"],
+      (result) => {
+        if (result) {
+          fetch(`${baseUrl}/v1/post/${postID}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }).then(async (res) => {
+            if (res.status === 200) {
+              await postsGenerator();
+              showSwal(
+                "پست مورد نظر با موفقیت حذف شد",
+                "success",
+                "اوکی",
+                () => {},
+              );
+            }
+          });
+        }
+      },
+    );
   };
 
   window.acceptPost = (postID) => {
